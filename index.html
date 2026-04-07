@@ -488,13 +488,61 @@ tbody tr:hover{background:var(--g50);}
 /* ─── SQL ─── */
 .sql-block{background:#0d1117;border-radius:var(--r-sm);padding:20px;font-family:"Courier New",monospace;font-size:11.5px;color:#a5b4fc;line-height:1.9;overflow-x:auto;white-space:pre;max-height:520px;overflow-y:auto;border:1.5px solid #1e293b;}
 
-/* ─── Toast ─── */
-.toast{position:fixed;bottom:24px;right:24px;background:var(--g900);color:white;padding:13px 22px;border-radius:var(--r-md);font-size:13.5px;font-weight:700;z-index:9999;transform:translateY(120px);opacity:0;transition:all .32s cubic-bezier(.4,0,.2,1);display:flex;align-items:center;gap:9px;max-width:360px;box-shadow:var(--sh-lg);}
-.toast.show{transform:translateY(0);opacity:1;}
-.toast.success{background:linear-gradient(135deg,var(--green),var(--green2));}
-.toast.error{background:linear-gradient(135deg,var(--red2),var(--red));}
-.toast.info{background:linear-gradient(135deg,var(--accent),var(--accent2));}
-.toast.warning{background:linear-gradient(135deg,var(--amber2),var(--amber));}
+/* ─── Toast / Notification ─── */
+.toast-container{position:fixed;bottom:28px;right:28px;z-index:9999;display:flex;flex-direction:column;gap:10px;pointer-events:none;align-items:flex-end;}
+.toast{
+  pointer-events:all;
+  min-width:280px;max-width:380px;
+  background:rgba(15,23,42,.96);
+  backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);
+  color:white;
+  border-radius:16px;
+  padding:0;
+  display:flex;align-items:stretch;
+  box-shadow:0 8px 32px rgba(0,0,0,.28),0 2px 8px rgba(0,0,0,.18),inset 0 1px 0 rgba(255,255,255,.08);
+  border:1px solid rgba(255,255,255,.1);
+  overflow:hidden;
+  transform:translateX(120%);
+  opacity:0;
+  transition:transform .38s cubic-bezier(.34,1.28,.64,1), opacity .28s ease;
+  will-change:transform,opacity;
+}
+.toast.show{transform:translateX(0);opacity:1;}
+.toast.hiding{transform:translateX(120%);opacity:0;transition:transform .28s cubic-bezier(.4,0,1,1),opacity .22s ease;}
+.toast-bar{width:4px;flex-shrink:0;border-radius:0;}
+.toast-body{padding:14px 16px;flex:1;display:flex;align-items:flex-start;gap:11px;}
+.toast-icon{font-size:18px;line-height:1;flex-shrink:0;margin-top:1px;}
+.toast-content{flex:1;min-width:0;}
+.toast-title{font-size:13px;font-weight:800;letter-spacing:-.2px;line-height:1.3;margin-bottom:2px;}
+.toast-msg{font-size:12px;color:rgba(255,255,255,.65);font-weight:600;line-height:1.4;}
+.toast-close{background:none;border:none;cursor:pointer;color:rgba(255,255,255,.3);padding:14px 14px 14px 0;font-size:16px;line-height:1;transition:color .18s;flex-shrink:0;align-self:flex-start;}
+.toast-close:hover{color:rgba(255,255,255,.7);}
+.toast-progress{height:3px;border-radius:0 0 16px 16px;animation:toast-prog 3.5s linear forwards;}
+@keyframes toast-prog{from{width:100%;}to{width:0%;}}
+
+/* Type variants */
+.toast.success .toast-bar{background:var(--green);}
+.toast.success .toast-icon-wrap{color:var(--green);}
+.toast.success .toast-progress{background:linear-gradient(90deg,var(--green),#4ade80);}
+.toast.error   .toast-bar{background:var(--red);}
+.toast.error   .toast-icon-wrap{color:#fb7185;}
+.toast.error   .toast-progress{background:linear-gradient(90deg,var(--red),#fb7185);}
+.toast.info    .toast-bar{background:var(--accent);}
+.toast.info    .toast-icon-wrap{color:#818cf8;}
+.toast.info    .toast-progress{background:linear-gradient(90deg,var(--accent),#818cf8);}
+.toast.warning .toast-bar{background:var(--amber);}
+.toast.warning .toast-icon-wrap{color:var(--amber);}
+.toast.warning .toast-progress{background:linear-gradient(90deg,var(--amber),#fbbf24);}
+.toast-icon-wrap{width:32px;height:32px;border-radius:10px;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:15px;}
+.toast.success .toast-icon-wrap{background:rgba(34,197,94,.15);}
+.toast.error   .toast-icon-wrap{background:rgba(244,63,94,.15);}
+.toast.info    .toast-icon-wrap{background:rgba(91,106,240,.15);}
+.toast.warning .toast-icon-wrap{background:rgba(245,158,11,.15);}
+
+@media(max-width:480px){
+  .toast-container{bottom:16px;right:12px;left:12px;}
+  .toast{min-width:0;width:100%;max-width:100%;}
+}
 
 /* ─── Feedback banner ─── */
 .feedback-banner{background:linear-gradient(135deg,#fffbeb,#fef9e7);border:1.5px solid #fcd34d;border-radius:var(--r-md);padding:16px 20px;margin-bottom:20px;display:flex;align-items:center;gap:16px;box-shadow:0 2px 14px rgba(245,158,11,.12);}
@@ -774,7 +822,7 @@ tbody tr:hover{background:var(--g50);}
         <div class="remember-row"><input type="checkbox" id="rememberMe"><label for="rememberMe">Lembrar acesso</label></div>
         <span class="forgot-link" onclick="showForgot()">Esqueci minha senha</span>
       </div>
-      <button id="btnEntrar" class="login-action-btn" onclick="(function(){if(typeof doLogin==='function'){doLogin();}else{alert('Erro: função doLogin não encontrada. Recarregue a página.');}})()">Entrar na plataforma →</button>
+      <button id="btnEntrar" class="login-action-btn" onclick="doLogin()">Entrar na plataforma →</button>
       <div class="login-notice">🔒 Acesso seguro com criptografia SSL e autenticação em dois fatores</div>
     </div>
 
@@ -795,7 +843,7 @@ tbody tr:hover{background:var(--g50);}
           Li e aceito os <span onclick="abrirModalTermos()" style="color:var(--accent);font-weight:600;text-decoration:underline;cursor:pointer;">Termos de Uso e Política de Privacidade</span> da Ciberic.Lab, incluindo o tratamento dos meus dados conforme a LGPD.
         </label>
       </div>
-      <button id="btnCadastrar" class="login-action-btn" onclick="(function(){if(typeof doRegister==='function'){doRegister();}else{alert('Erro: função doRegister não encontrada. Recarregue a página.');}})()">Criar minha conta grátis →</button>
+      <button id="btnCadastrar" class="login-action-btn" onclick="doRegister()">Criar minha conta grátis →</button>
       <div class="login-notice">📨 Ao criar sua conta, você receberá um código de verificação por e-mail.<br>Ao demonstrar interesse em vagas, seus dados de contato são encaminhados diretamente para a <strong>empresa responsável pela vaga</strong>. O recrutador VagasPro apenas publica as vagas e não tem acesso aos seus dados.</div>
     </div>
 
@@ -1205,18 +1253,12 @@ tbody tr:hover{background:var(--g50);}
   </div>
 </div>
 
-<div class="toast" id="toast"></div>
+<div class="toast-container" id="toastContainer"></div>
 
-<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
+<script>
 // ── Error catcher (debug) ───────────────────────────────────────
 window.onerror = function(msg, src, line, col, err) {
-  var toast = document.getElementById('toast');
-  if(toast){
-    toast.textContent = '⚠️ JS Error L'+line+': '+msg;
-    toast.className = 'toast error show';
-    setTimeout(function(){toast.classList.remove('show');}, 8000);
-  }
-  console.error('[VagasPro Error]', msg, 'at line', line, src);
+  console.error('[VagasPro]', msg, 'L'+line, src);
   return false;
 };
 // ═══════════════════════════════════════════════════════════
@@ -2370,8 +2412,89 @@ function renderSQL(){document.getElementById('sqlBlock').textContent=SQL_TXT;}
 function copiarSQL(){navigator.clipboard.writeText(SQL_TXT).then(()=>showToast('✅ SQL copiado!','success'));}
 function exportarSQLFile(){const blob=new Blob([SQL_TXT],{type:'text/plain'});const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='vagaspro_v3_supabase.sql';a.click();showToast('✅ SQL baixado!','success');}
 
-// ===== TOAST =====
-function showToast(msg,type=''){const t=document.getElementById('toast');t.textContent=msg;t.className='toast'+(type?' '+type:'');t.classList.add('show');clearTimeout(t._t);t._t=setTimeout(()=>t.classList.remove('show'),3500);}
+// ===== TOAST / NOTIFICATION =====
+var _toastQueue = [];
+var _toastActive = 0;
+var MAX_TOASTS = 4;
+
+function showToast(msg, type) {
+  type = type || '';
+  // Parse message: if contains newline or is long, split into title+body
+  var title = '', body = msg || '';
+  // Icons per type
+  var icons = {success:'✓', error:'✕', warning:'!', info:'i', '':'●'};
+  var labels = {success:'Sucesso', error:'Erro', warning:'Atenção', info:'Info', '':'Aviso'};
+  
+  // If msg starts with emoji, use it as icon
+  var emojiMatch = body.match(/^([🍳🧹🛒🔧⚡💊👥⚙️🚌✅❌⭐♥📧🎉🔒💾📋🔍🗑✏📱✉🏆🔔📄⚠️👤🏢🔥💼📰🗄️]\s*)/);
+  var toastIcon = '';
+  if (emojiMatch) {
+    toastIcon = emojiMatch[0].trim();
+    body = body.slice(emojiMatch[0].length);
+  } else {
+    toastIcon = icons[type] || '●';
+  }
+  
+  // Separate title from body if has ":"
+  var colonIdx = body.indexOf('. ');
+  if (colonIdx > 0 && colonIdx < 60 && body.length > colonIdx + 2) {
+    // keep as one line for short messages
+  }
+
+  var container = document.getElementById('toastContainer');
+  if (!container) return;
+
+  // Limit stacked toasts
+  if (_toastActive >= MAX_TOASTS) {
+    var first = container.querySelector('.toast');
+    if (first) _dismissToast(first);
+  }
+
+  var id = 'toast_' + Date.now();
+  var el = document.createElement('div');
+  el.id = id;
+  el.className = 'toast' + (type ? ' ' + type : '');
+  el.innerHTML =
+    '<div class="toast-bar"></div>' +
+    '<div class="toast-body">' +
+      '<div class="toast-icon-wrap">' + toastIcon + '</div>' +
+      '<div class="toast-content">' +
+        '<div class="toast-title">' + _sanitizeToast(body) + '</div>' +
+      '</div>' +
+      '<button class="toast-close" onclick="_dismissToast(document.getElementById(\'' + id + '\'))">✕</button>' +
+    '</div>' +
+    '<div class="toast-progress"></div>';
+
+  container.appendChild(el);
+  _toastActive++;
+
+  // Animate in
+  requestAnimationFrame(function() {
+    requestAnimationFrame(function() {
+      el.classList.add('show');
+    });
+  });
+
+  // Auto dismiss
+  el._timer = setTimeout(function() { _dismissToast(el); }, 3800);
+}
+
+function _dismissToast(el) {
+  if (!el || el._dismissed) return;
+  el._dismissed = true;
+  clearTimeout(el._timer);
+  el.classList.remove('show');
+  el.classList.add('hiding');
+  setTimeout(function() {
+    if (el.parentNode) el.parentNode.removeChild(el);
+    _toastActive = Math.max(0, _toastActive - 1);
+  }, 320);
+}
+
+function _sanitizeToast(s) {
+  if (typeof s !== 'string') return '';
+  return s.replace(/[<>]/g, function(ch) { return ch === '<' ? '&lt;' : '&gt;'; });
+}
 
 // ===== MODAL TERMOS =====
 function abrirModalTermos(){
