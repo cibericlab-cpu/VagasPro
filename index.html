@@ -92,7 +92,7 @@ html,body{height:100%;overflow:hidden;}
 
 /* ─── Sidebar ─── */
 .sidebar{
-  width:var(--sidebar-w);min-height:100vh;
+  width:var(--sidebar-w);height:100vh;
   background:linear-gradient(175deg,var(--navy) 0%,var(--navy2) 100%);
   display:flex;flex-direction:column;
   flex-shrink:0;position:fixed;top:0;left:0;z-index:200;
@@ -100,7 +100,13 @@ html,body{height:100%;overflow:hidden;}
   border-right:1px solid rgba(255,255,255,.05);
   overflow-y:auto;
   overflow-x:hidden;
+  scrollbar-width:thin;
+  scrollbar-color:rgba(255,255,255,.12) transparent;
 }
+.sidebar::-webkit-scrollbar{width:4px;}
+.sidebar::-webkit-scrollbar-track{background:transparent;}
+.sidebar::-webkit-scrollbar-thumb{background:rgba(255,255,255,.12);border-radius:99px;}
+.sidebar::-webkit-scrollbar-thumb:hover{background:rgba(255,255,255,.25);}
 .sidebar-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:199;backdrop-filter:blur(3px);}
 
 .sidebar-logo{
@@ -148,7 +154,7 @@ html,body{height:100%;overflow:hidden;}
 }
 .nav-item.active .nav-badge{background:var(--accent);color:white;}
 
-.sidebar-bottom{margin-top:auto;border-top:1px solid rgba(255,255,255,.07);}
+.sidebar-bottom{border-top:1px solid rgba(255,255,255,.07);margin-top:8px;}
 .sidebar-user{
   padding:14px 16px;display:flex;align-items:center;gap:11px;
   cursor:pointer;transition:background var(--t);
@@ -593,6 +599,11 @@ tbody tr:hover{background:var(--g50);}
 .remember-row{display:flex;align-items:center;gap:8px;font-size:13px;color:var(--g600);font-weight:600;}
 .remember-row input{width:16px;height:16px;accent-color:var(--accent);cursor:pointer;border-radius:8px;}
 .forgot-link{font-size:12.5px;color:var(--accent);cursor:pointer;font-weight:700;}
+.pwd-wrap{position:relative;}
+.pwd-wrap input{padding-right:44px!important;}
+.pwd-eye{position:absolute;right:13px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;color:var(--g400);padding:4px;border-radius:6px;display:flex;align-items:center;justify-content:center;transition:color var(--t);}
+.pwd-eye:hover{color:var(--accent);}
+.pwd-eye svg{width:18px;height:18px;pointer-events:none;}
 .forgot-link:hover{text-decoration:underline;}
 
 .login-action-btn{width:100%;height:48px;background:linear-gradient(135deg,var(--accent),var(--accent2));color:white;border:none;border-radius:var(--r-pill);font-size:14.5px;font-weight:800;font-family:inherit;cursor:pointer;transition:all var(--t);box-shadow:0 4px 18px rgba(91,106,240,.38);letter-spacing:-.2px;}
@@ -619,9 +630,9 @@ tbody tr:hover{background:var(--g50);}
 .av-sm{width:36px;height:36px;font-size:13px;border-width:2px;}
 
 /* ─── CV Builder ─── */
-.cv-builder-wrap{display:grid;grid-template-columns:1fr 400px;gap:20px;min-height:600px;}
+.cv-builder-wrap{display:grid;grid-template-columns:1fr 240px;gap:20px;min-height:600px;}
 .cv-form-panel{background:white;border:1.5px solid var(--g150);border-radius:var(--r-md);padding:24px;overflow-y:auto;max-height:82vh;box-shadow:var(--sh-xs);}
-.cv-preview-panel{background:white;border:1.5px solid var(--g150);border-radius:var(--r-md);overflow:hidden;display:flex;flex-direction:column;box-shadow:var(--sh-xs);}
+.cv-preview-panel{background:white;border:1.5px solid var(--g150);border-radius:var(--r-md);overflow:hidden;display:flex;flex-direction:column;box-shadow:var(--sh-xs);position:sticky;top:80px;height:fit-content;}
 .cv-preview-header{background:var(--g50);border-bottom:1.5px solid var(--g150);padding:14px 18px;display:flex;align-items:center;justify-content:space-between;}
 .cv-preview-header-title{font-size:13.5px;font-weight:800;color:var(--g700);}
 .cv-preview-body{flex:1;overflow-y:auto;padding:0;}
@@ -649,6 +660,19 @@ tbody tr:hover{background:var(--g50);}
 .cv-edu-inst{font-size:11.5px;color:var(--g500);font-weight:600;}
 .cv-edu-ano{font-size:11px;color:var(--g400);font-weight:600;}
 .cv-refs{font-size:11px;color:var(--g400);font-style:italic;margin-top:14px;text-align:center;border-top:1.5px solid var(--g200);padding-top:9px;}
+/* CV Preview Modal */
+.cv-modal-overlay{position:fixed;inset:0;background:rgba(10,15,40,.75);z-index:2000;display:none;align-items:flex-start;justify-content:center;padding:24px;backdrop-filter:blur(6px);overflow-y:auto;}
+.cv-modal-overlay.open{display:flex;}
+.cv-modal-wrap{background:white;border-radius:var(--r);width:100%;max-width:900px;margin:0 auto;box-shadow:var(--sh-xl);overflow:hidden;animation:fadeUp .24s ease;}
+.cv-modal-toolbar{background:var(--g900);padding:14px 20px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:10;}
+.cv-modal-toolbar-title{font-size:13.5px;font-weight:800;color:white;display:flex;align-items:center;gap:8px;}
+.cv-modal-toolbar-actions{display:flex;gap:8px;align-items:center;}
+.cv-zoom-btn{width:32px;height:32px;border-radius:var(--r-sm);border:1.5px solid rgba(255,255,255,.15);background:rgba(255,255,255,.08);color:white;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:14px;transition:all .18s;}
+.cv-zoom-btn:hover{background:rgba(255,255,255,.18);}
+.cv-modal-close{width:34px;height:34px;border-radius:50%;border:1.5px solid rgba(255,255,255,.2);background:rgba(255,255,255,.08);color:white;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:16px;transition:all .18s;}
+.cv-modal-close:hover{background:rgba(255,255,255,.22);}
+.cv-modal-body{background:var(--g100);padding:32px;display:flex;justify-content:center;min-height:600px;}
+.cv-modal-page{background:white;width:210mm;box-shadow:0 8px 40px rgba(0,0,0,.18);border-radius:4px;transform-origin:top center;transition:transform .2s ease;}
 
 /* ─── CV IA section ─── */
 .cv-ia-section{background:linear-gradient(135deg,#f0f2ff,#e8ecfe);border:1.5px solid #c7cffd;border-radius:var(--r-sm);padding:15px;margin-bottom:18px;}
@@ -816,7 +840,13 @@ tbody tr:hover{background:var(--g50);}
       <div class="login-sep">ou com e-mail e senha</div>
       <div class="login-field-group">
         <div class="login-field"><label>E-mail</label><input type="email" id="loginEmail" placeholder="seu [arroba] email.com" onkeydown="if(event.key==='Enter')doLogin()"></div>
-        <div class="login-field"><label>Senha</label><input type="password" id="loginSenha" placeholder="••••••••" onkeydown="if(event.key==='Enter')doLogin()"></div>
+        <div class="login-field"><label>Senha</label>
+          <div class="pwd-wrap">
+            <input type="password" id="loginSenha" placeholder="••••••••" onkeydown="if(event.key==='Enter')doLogin()">
+            <button type="button" class="pwd-eye" onclick="toggleSenha('loginSenha',this)" tabindex="-1" title="Mostrar/ocultar senha">
+              <svg id="eyeIcon_loginSenha" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+            </button>
+          </div></div>
       </div>
       <div class="login-extras">
         <div class="remember-row"><input type="checkbox" id="rememberMe"><label for="rememberMe">Lembrar acesso</label></div>
@@ -834,8 +864,20 @@ tbody tr:hover{background:var(--g50);}
         <div class="login-field"><label>Tipo de Conta</label>
           <select id="regTipo"><option value="candidato">👤 Candidato – estou buscando emprego</option><option value="recrutador">🏢 Recrutador – contrato pessoas</option></select>
         </div>
-        <div class="login-field"><label>Senha * (mínimo 6 caracteres)</label><input type="password" id="regSenha" placeholder="••••••••"></div>
-        <div class="login-field"><label>Confirmar Senha *</label><input type="password" id="regSenhaConf" placeholder="••••••••" onkeydown="if(event.key==='Enter')doRegister()"></div>
+        <div class="login-field"><label>Senha * (mínimo 6 caracteres)</label>
+          <div class="pwd-wrap">
+            <input type="password" id="regSenha" placeholder="••••••••">
+            <button type="button" class="pwd-eye" onclick="toggleSenha('regSenha',this)" tabindex="-1" title="Mostrar/ocultar senha">
+              <svg id="eyeIcon_regSenha" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+            </button>
+          </div></div>
+        <div class="login-field"><label>Confirmar Senha *</label>
+          <div class="pwd-wrap">
+            <input type="password" id="regSenhaConf" placeholder="••••••••" onkeydown="if(event.key==='Enter')doRegister()">
+            <button type="button" class="pwd-eye" onclick="toggleSenha('regSenhaConf',this)" tabindex="-1" title="Mostrar/ocultar senha">
+              <svg id="eyeIcon_regSenhaConf" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+            </button>
+          </div></div>
       </div>
       <div style="display:flex;align-items:flex-start;gap:8px;margin-bottom:14px;padding:10px 12px;background:var(--g50);border:1.5px solid var(--g200);border-radius:var(--r-xs);">
         <input type="checkbox" id="aceitoTermos" style="width:15px;height:15px;margin-top:2px;accent-color:var(--accent);cursor:pointer;flex-shrink:0;">
@@ -929,13 +971,13 @@ tbody tr:hover{background:var(--g50);}
     <div class="nav-item" id="nav-usuarios" onclick="navTo('usuarios',this)"><svg class="nav-ic" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"/></svg>Usuários</div>
     <div class="nav-item" id="nav-noticias" onclick="navTo('noticias',this)"><svg class="nav-ic" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2m-4-3H9M7 16h6M7 8h6v4H7V8z"/></svg>Notícias</div>
     <div class="nav-item" id="nav-configuracoes" onclick="navTo('configuracoes',this)"><svg class="nav-ic" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/><circle cx="12" cy="12" r="3"/></svg>Configurações</div>
-    <div class="nav-item" id="nav-supabase" onclick="navTo('supabase',this)"><svg class="nav-ic" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3"/><path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"/></svg>Banco de Dados</div>
+
   </div>
   <div style="padding:8px 14px 2px;border-top:1px solid rgba(255,255,255,.05);">
     <button onclick="abrirModalTermos()" style="background:none;border:none;color:rgba(255,255,255,.25);font-size:10.5px;cursor:pointer;font-family:inherit;padding:4px 0;width:100%;text-align:left;transition:color .18s;" onmouseenter="this.style.color='rgba(255,255,255,.5)'" onmouseleave="this.style.color='rgba(255,255,255,.25)'">📄 Termos de Uso & Privacidade</button>
   </div>
   <div class="sidebar-bottom">
-    <div class="sidebar-user" onclick="if(confirm('Deseja sair da sua conta?'))signOutGoogle()">
+    <div class="sidebar-user" onclick="showLogoutModal()">
       <div class="ua-wrap"><div class="ua" id="sidebarAvatar">AD</div><div class="ua-dot"></div></div>
       <div style="flex:1;min-width:0;"><div class="ui-name" id="sidebarNome">Admin</div><span class="ui-role r-sa" id="sidebarRoleBadge">SuperAdmin</span></div>
       <svg width="12" height="12" fill="none" viewBox="0 0 24 24" stroke="rgba(255,255,255,.3)" stroke-width="2"><path d="M9 5l7 7-7 7"/></svg>
@@ -1021,7 +1063,16 @@ tbody tr:hover{background:var(--g50);}
           <div class="form-group"><label class="form-lbl">Status</label><select class="fs" id="f-status"><option value="aberto">Em Aberto</option><option value="urgente">Urgente</option><option value="encerrado">Encerrado</option></select></div>
           <div class="form-group"><label class="form-lbl">Logo (opcional)</label><input type="file" class="fi" id="f-logo" accept="image/*" style="padding:7px;height:auto;"></div>
           <div class="form-group"><label class="form-lbl">Limite de Candidatos <span style="color:var(--g400);font-weight:400;">(opcional)</span></label><input type="number" class="fi" id="f-max-candidatos" placeholder="Ex: 50 – notifica ao atingir 90%/100%" min="1" max="9999"></div>
-          <div class="form-group"><label class="form-lbl">Publicado por</label><input type="text" class="fi" id="f-criado-por" placeholder="Nome da empresa que criou a vaga"></div>
+          <div class="form-group">
+            <label class="form-lbl">Publicado por</label>
+            <div style="position:relative;">
+              <input type="text" class="fi" id="f-criado-por" readonly
+                style="background:var(--g50);color:var(--g600);cursor:default;padding-right:40px;"
+                placeholder="Preenchido automaticamente">
+              <div style="position:absolute;right:13px;top:50%;transform:translateY(-50%);font-size:14px;pointer-events:none;" title="Preenchido automaticamente">🔒</div>
+            </div>
+            <div style="font-size:10.5px;color:var(--g400);font-weight:600;margin-top:3px;" id="f-criado-info"></div>
+          </div>
         </div>
         <div class="divider"></div>
         <div style="display:flex;gap:8px;justify-content:flex-end;"><button class="btn btn-secondary" onclick="limparForm()">Cancelar</button><button class="btn btn-primary" onclick="salvarVaga()">💾 Salvar Vaga</button></div>
@@ -1125,14 +1176,20 @@ tbody tr:hover{background:var(--g50);}
           </div>
         </div>
 
-        <!-- PREVIEW PANEL -->
-        <div class="cv-preview-panel">
-          <div class="cv-preview-header"><div class="cv-preview-header-title">👁 Pré-visualização do Currículo</div><button class="btn btn-primary btn-sm" onclick="exportarCVPDF()">⬇ PDF</button></div>
-          <div class="cv-preview-scale-wrap">
-            <div id="cvPagePreview" class="cv-page" style="transform:scale(0.56);transform-origin:top center;width:210mm;margin-bottom:-320px;">
-              <!-- preenchido dinamicamente -->
-            </div>
+        <!-- PREVIEW PANEL — floating preview button -->
+        <div class="cv-preview-panel" style="display:flex;flex-direction:column;align-items:center;justify-content:center;background:var(--g100);border:2px dashed var(--g300);">
+          <div style="font-size:40px;margin-bottom:12px;">📄</div>
+          <div style="font-size:13.5px;font-weight:800;color:var(--g700);margin-bottom:6px;">Prévia do Currículo</div>
+          <div style="font-size:12px;color:var(--g400);margin-bottom:18px;text-align:center;padding:0 20px;">Preencha os campos ao lado e visualize em tela cheia</div>
+          <button class="btn btn-primary btn-sm" onclick="abrirPreviewCV()" style="gap:7px;">
+            <svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+            Ver Prévia
+          </button>
+          <div style="margin-top:10px;">
+            <button class="btn btn-green btn-sm" onclick="exportarCVPDF()">⬇ Exportar PDF</button>
           </div>
+          <!-- hidden page for PDF export -->
+          <div id="cvPagePreview" class="cv-page" style="position:absolute;left:-9999px;top:-9999px;width:210mm;transform:none;margin:0;"></div>
         </div>
       </div>
     </div>
@@ -1187,7 +1244,7 @@ tbody tr:hover{background:var(--g50);}
     </div>
 
     <!-- USUÁRIOS -->
-    <div class="page" id="page-usuarios"><div class="section-header" style="margin-bottom:16px;"><div class="section-title">Gestão de Usuários</div><button class="btn btn-primary btn-sm" onclick="showToast('Criar usuário','')">+ Novo Usuário</button></div><div class="table-wrap"><div class="table-scroll"><table><thead><tr><th>Nome</th><th>E-mail</th><th>WhatsApp</th><th>Nível</th><th>Status</th><th>Cadastro</th><th>Ações</th></tr></thead><tbody id="usuariosTableBody"></tbody></table></div></div></div>
+    <div class="page" id="page-usuarios"><div class="section-header" style="margin-bottom:16px;"><div class="section-title">Gestão de Usuários</div><button class="btn btn-primary btn-sm" onclick="abrirNovoUsuario()">+ Novo Usuário</button></div><div class="table-wrap"><div class="table-scroll"><table><thead><tr><th>Nome</th><th>E-mail</th><th>WhatsApp</th><th>Nível</th><th>Status</th><th>Cadastro</th><th>Ações</th></tr></thead><tbody id="usuariosTableBody"></tbody></table></div></div></div>
 
     <!-- NOTÍCIAS -->
     <div class="page" id="page-noticias">
@@ -1201,11 +1258,8 @@ tbody tr:hover{background:var(--g50);}
       <div class="section-header" style="margin-bottom:16px;"><div class="section-title">Configurações do Sistema</div></div>
       <div class="config-section"><div class="config-title">🎨 Visibilidade de Abas por Nível</div><div id="configAbasLista"></div></div>
       <div class="config-section"><div class="config-title">🔔 Notificações</div><div class="config-row"><div><div class="config-lbl">Alertas de novas vagas</div><div class="config-desc">Notificar quando uma vaga combinar com seu perfil</div></div><div class="toggle on" onclick="this.classList.toggle('on')"></div></div><div class="config-row"><div><div class="config-lbl">Candidatos nas vagas (Recrutador)</div><div class="config-desc">Notificar ao receber novo candidato</div></div><div class="toggle on" onclick="this.classList.toggle('on')"></div></div><div class="config-row"><div><div class="config-lbl">Lembrete de feedback de emprego</div><div class="config-desc">Solicitar feedback após 30 dias de busca ativa</div></div><div class="toggle on" onclick="this.classList.toggle('on')"></div></div></div>
-      <div class="config-section"><div class="config-title">💾 Dados e Exportação</div><div class="config-row"><div><div class="config-lbl">Exportar vagas em CSV</div><div class="config-desc">Download com todos os campos</div></div><button class="btn btn-ghost btn-sm" onclick="exportarCSV()">⬇ Exportar</button></div><div class="config-row"><div><div class="config-lbl">Backup Supabase</div><div class="config-desc">Executar backup manual das tabelas</div></div><button class="btn btn-green btn-sm" onclick="showToast('Backup iniciado!','success')">▶ Executar</button></div></div>
+      <div class="config-section"><div class="config-title">💾 Dados e Exportação</div><div class="config-row"><div><div class="config-lbl">Exportar vagas em CSV</div><div class="config-desc">Download com todos os campos</div></div><button class="btn btn-ghost btn-sm" onclick="exportarCSV()">⬇ Exportar</button></div><div class="config-row"><div><div class="config-lbl">Backup do Sistema</div><div class="config-desc">Executar backup manual das tabelas</div></div><button class="btn btn-green btn-sm" onclick="showToast('Backup iniciado!','success')">▶ Executar</button></div></div>
     </div>
-
-    <!-- SQL -->
-    <div class="page" id="page-supabase"><div class="section-header" style="margin-bottom:14px;"><div class="section-title">Script de Banco de Dados</div><div style="display:flex;gap:7px;"><button class="btn btn-primary btn-sm" onclick="copiarSQL()">📋 Copiar</button><button class="btn btn-ghost btn-sm" onclick="exportarSQLFile()">⬇ .sql</button></div></div><div class="hl">ℹ️ Execute no <strong>SQL Editor</strong> do Supabase para criar todas as tabelas, RLS, índices e funções.</div><div class="sql-block" id="sqlBlock"></div></div>
 
     <!-- TERMOS -->
     <div class="page" id="page-termos">
@@ -1253,6 +1307,147 @@ tbody tr:hover{background:var(--g50);}
   </div>
 </div>
 
+<!-- MODAL REMOVER USUÁRIO -->
+<div class="modal-overlay" id="removeUserModal" style="z-index:3100;">
+  <div style="background:white;border-radius:24px;padding:36px 32px;max-width:400px;width:100%;text-align:center;box-shadow:0 24px 64px rgba(0,0,0,.18);animation:fadeUp .22s ease;">
+    <div style="width:64px;height:64px;background:linear-gradient(135deg,#fff1f3,#ffd6db);border-radius:20px;display:flex;align-items:center;justify-content:center;font-size:28px;margin:0 auto 20px;">⚠️</div>
+    <div style="font-size:19px;font-weight:900;color:var(--g900);margin-bottom:8px;letter-spacing:-.4px;">Remover usuário?</div>
+    <div style="font-size:13px;color:var(--g500);font-weight:600;margin-bottom:10px;line-height:1.5;">Você está prestes a remover permanentemente:</div>
+    <div id="removeUserName" style="font-size:15px;font-weight:800;color:var(--red);margin-bottom:4px;">–</div>
+    <div id="removeUserEmail" style="font-size:12px;color:var(--g400);margin-bottom:20px;">–</div>
+    <div style="background:var(--red-soft);border:1.5px solid #fca5a5;border-radius:var(--r-sm);padding:10px 14px;margin-bottom:24px;font-size:12px;color:var(--red2);line-height:1.5;">
+      🔒 Esta ação remove o usuário do sistema.<br>Os dados de vagas e interesses vinculados serão preservados.
+    </div>
+    <div style="display:flex;gap:10px;">
+      <button onclick="fecharRemoverUsuario()" style="flex:1;height:46px;border:1.5px solid var(--g200);border-radius:var(--r-pill);background:white;font-size:13.5px;font-weight:700;font-family:inherit;color:var(--g600);cursor:pointer;transition:all var(--t);" onmouseenter="this.style.background='var(--g50)'" onmouseleave="this.style.background='white'">Cancelar</button>
+      <button onclick="executarRemoverUsuario()" id="btnConfirmRemoveUser" style="flex:1;height:46px;border:none;border-radius:var(--r-pill);background:linear-gradient(135deg,var(--red),var(--red2));color:white;font-size:13.5px;font-weight:800;font-family:inherit;cursor:pointer;box-shadow:0 4px 14px rgba(244,63,94,.3);">Remover</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL EDITAR / NOVO USUÁRIO (compartilhado) -->
+<div class="modal-overlay" id="editUserModal" style="z-index:2500;">
+  <div class="modal" style="max-width:520px;">
+    <div class="modal-header" style="padding:20px 24px 16px;">
+      <div style="flex:1;">
+        <div style="font-size:16px;font-weight:900;color:var(--g900);" id="editUserTitle">✏️ Editar Usuário</div>
+        <div style="font-size:11.5px;color:var(--g400);margin-top:2px;" id="editUserSubtitle">Altere os dados do usuário abaixo</div>
+      </div>
+      <button class="modal-close" onclick="fecharEditarUsuario()">✕</button>
+    </div>
+    <div class="modal-body" style="padding:20px 24px;">
+      <div class="form-grid">
+        <div class="form-group full">
+          <label class="form-lbl">Nome Completo <span class="form-req">*</span></label>
+          <input type="text" class="fi" id="eu-nome" placeholder="Nome completo do usuário">
+        </div>
+        <div class="form-group">
+          <label class="form-lbl">E-mail <span class="form-req">*</span></label>
+          <input type="email" class="fi" id="eu-email" placeholder="nome [arroba] dominio.com">
+        </div>
+        <div class="form-group">
+          <label class="form-lbl">WhatsApp</label>
+          <input type="text" class="fi" id="eu-whatsapp" placeholder="(62) 99999-9999">
+        </div>
+        <div class="form-group">
+          <label class="form-lbl">Nível de Acesso <span class="form-req">*</span></label>
+          <select class="fs" id="eu-nivel">
+            <option value="candidato">👤 Candidato</option>
+            <option value="recrutador">🏢 Recrutador</option>
+            <option value="supervisor">🔷 Supervisor</option>
+            <option value="admin">⚙️ Admin</option>
+            <option value="superadmin">👑 SuperAdmin</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-lbl">Status</label>
+          <select class="fs" id="eu-status">
+            <option value="ativo">🟢 Ativo</option>
+            <option value="inativo">⚪ Inativo</option>
+            <option value="suspenso">🔴 Suspenso</option>
+          </select>
+        </div>
+        <!-- SENHA -->
+        <div class="form-group" id="eu-senha-group">
+          <label class="form-lbl" id="eu-senha-lbl">Nova Senha <span style="color:var(--g400);font-weight:400;">(opcional — deixe em branco para manter)</span></label>
+          <div class="pwd-wrap">
+            <input type="password" class="fi" id="eu-senha" placeholder="••••••••" autocomplete="new-password">
+            <button type="button" class="pwd-eye" onclick="toggleSenha('eu-senha',this)" tabindex="-1">
+              <svg id="eyeIcon_eu-senha" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+            </button>
+          </div>
+        </div>
+        <div class="form-group" id="eu-senha-conf-group">
+          <label class="form-lbl">Confirmar Senha</label>
+          <div class="pwd-wrap">
+            <input type="password" class="fi" id="eu-senha-conf" placeholder="••••••••" autocomplete="new-password">
+            <button type="button" class="pwd-eye" onclick="toggleSenha('eu-senha-conf',this)" tabindex="-1">
+              <svg id="eyeIcon_eu-senha-conf" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+            </button>
+          </div>
+        </div>
+      </div>
+      <div class="hl hl-amber" style="margin-top:16px;font-size:11.5px;" id="editUserHint">
+        ⚠️ Alterações no nível de acesso têm efeito imediato no próximo login do usuário.
+      </div>
+    </div>
+    <div style="padding:14px 24px 20px;border-top:1.5px solid var(--g100);display:flex;justify-content:flex-end;gap:8px;">
+      <button class="btn btn-secondary" onclick="fecharEditarUsuario()">Cancelar</button>
+      <button class="btn btn-primary" id="editUserSaveBtn" onclick="salvarEditarUsuario()">💾 Salvar Alterações</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL PREVIEW CURRÍCULO -->
+<div class="cv-modal-overlay" id="cvPreviewModal" onclick="if(event.target===this)fecharPreviewCV()">
+  <div class="cv-modal-wrap">
+    <div class="cv-modal-toolbar">
+      <div class="cv-modal-toolbar-title">
+        <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+        Pré-visualização do Currículo
+      </div>
+      <div class="cv-modal-toolbar-actions">
+        <button class="cv-zoom-btn" onclick="cvZoom(-0.1)" title="Diminuir">−</button>
+        <span id="cvZoomLabel" style="color:rgba(255,255,255,.6);font-size:11.5px;font-weight:700;min-width:36px;text-align:center;">100%</span>
+        <button class="cv-zoom-btn" onclick="cvZoom(+0.1)" title="Aumentar">+</button>
+        <button class="btn btn-green btn-sm" onclick="exportarCVPDF()" style="margin-left:8px;">⬇ PDF</button>
+        <button class="cv-modal-close" onclick="fecharPreviewCV()" title="Fechar">✕</button>
+      </div>
+    </div>
+    <div class="cv-modal-body" id="cvModalBody">
+      <div id="cvModalPage" class="cv-modal-page"></div>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL REMOVER VAGA -->
+<div class="modal-overlay" id="removeVagaModal" style="z-index:3000;">
+  <div style="background:white;border-radius:24px;padding:36px 32px;max-width:380px;width:100%;text-align:center;box-shadow:0 24px 64px rgba(0,0,0,.18);animation:fadeUp .22s ease;">
+    <div style="width:64px;height:64px;background:linear-gradient(135deg,#fff1f3,#ffd6db);border-radius:20px;display:flex;align-items:center;justify-content:center;font-size:28px;margin:0 auto 20px;">🗑️</div>
+    <div style="font-size:19px;font-weight:900;color:var(--g900);margin-bottom:8px;letter-spacing:-.4px;">Remover vaga?</div>
+    <div style="font-size:13px;color:var(--g400);font-weight:600;margin-bottom:6px;line-height:1.5;">Você está prestes a remover:</div>
+    <div id="removeVagaLabel" style="font-size:14px;font-weight:800;color:var(--red);margin-bottom:20px;padding:10px 16px;background:var(--red-soft);border-radius:var(--r-sm);">–</div>
+    <div style="font-size:11.5px;color:var(--g400);margin-bottom:24px;">⚠️ Esta ação não pode ser desfeita.</div>
+    <div style="display:flex;gap:10px;">
+      <button onclick="fecharRemoverModal()" style="flex:1;height:46px;border:1.5px solid var(--g200);border-radius:var(--r-pill);background:white;font-size:13.5px;font-weight:700;font-family:inherit;color:var(--g600);cursor:pointer;" onmouseenter="this.style.background='var(--g50)'" onmouseleave="this.style.background='white'">Cancelar</button>
+      <button onclick="confirmarRemoverVaga()" style="flex:1;height:46px;border:none;border-radius:var(--r-pill);background:linear-gradient(135deg,var(--red),var(--red2));color:white;font-size:13.5px;font-weight:800;font-family:inherit;cursor:pointer;box-shadow:0 4px 14px rgba(244,63,94,.3);" onmouseenter="this.style.transform='translateY(-1px)'" onmouseleave="this.style.transform='translateY(0)'">Remover</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL LOGOUT -->
+<div class="modal-overlay" id="logoutModal" style="z-index:3000;">
+  <div style="background:white;border-radius:24px;padding:36px 32px;max-width:380px;width:100%;text-align:center;box-shadow:0 24px 64px rgba(0,0,0,.18),0 8px 24px rgba(0,0,0,.1);animation:fadeUp .22s ease;">
+    <div style="width:64px;height:64px;background:linear-gradient(135deg,#fff1f3,#ffd6db);border-radius:20px;display:flex;align-items:center;justify-content:center;font-size:28px;margin:0 auto 20px;">🔐</div>
+    <div style="font-size:19px;font-weight:900;color:var(--g900);margin-bottom:8px;letter-spacing:-.4px;">Sair da conta?</div>
+    <div style="font-size:13px;color:var(--g400);font-weight:600;margin-bottom:28px;line-height:1.5;">Você será desconectado do VagasPro.<br>Sua sessão será encerrada com segurança.</div>
+    <div style="display:flex;gap:10px;">
+      <button onclick="fecharLogoutModal()" style="flex:1;height:46px;border:1.5px solid var(--g200);border-radius:var(--r-pill);background:white;font-size:13.5px;font-weight:700;font-family:inherit;color:var(--g600);cursor:pointer;transition:all var(--t);" onmouseenter="this.style.background='var(--g50)'" onmouseleave="this.style.background='white'">Cancelar</button>
+      <button onclick="confirmarLogout()" style="flex:1;height:46px;border:none;border-radius:var(--r-pill);background:linear-gradient(135deg,var(--red),var(--red2));color:white;font-size:13.5px;font-weight:800;font-family:inherit;cursor:pointer;transition:all var(--t);box-shadow:0 4px 14px rgba(244,63,94,.3);" onmouseenter="this.style.transform='translateY(-1px)'" onmouseleave="this.style.transform='translateY(0)'">Sair agora</button>
+    </div>
+  </div>
+</div>
+
 <div class="toast-container" id="toastContainer"></div>
 
 <script>
@@ -1263,16 +1458,15 @@ window.onerror = function(msg, src, line, col, err) {
   return false;
 };
 // ═══════════════════════════════════════════════════════════
-// CONFIGURAÇÃO SUPABASE
-// Substitua pelas suas credenciais do painel Supabase:
-// Settings > API > Project URL e anon public key
+// CONFIGURAÇÃO DO BANCO DE DADOS
+// Substitua pelas suas credenciais do painel:
 // ═══════════════════════════════════════════════════════════
-const SUPABASE_URL  = 'https://wsvqzagbulfufyqowwfx._sb.co';
+const SUPABASE_URL  = 'https://wsvqzagbulfufyqowwfx.supabase.co';
 const SUPABASE_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6IndzdnF6YWdidWxmdWZ5cW93d2Z4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzU1MTYwNzgsImV4cCI6MjA5MTA5MjA3OH0.Nat7Ba1pzzYJDM8jZoZqg_D7rg8Kb4v7Cnzq1uU005Q';
 let _sb = null;
 
 // Inicializa cliente Supabase (se credenciais configuradas)
-function initSupabase(){
+function initDB(){
   try{
     if(!SUPABASE_URL || !SUPABASE_URL.startsWith('https://') || SUPABASE_URL.includes('SEU-PROJETO')) return;
     _sb = window.supabase?.createClient(SUPABASE_URL, SUPABASE_ANON, {
@@ -1282,8 +1476,8 @@ function initSupabase(){
         detectSessionInUrl: false
       }
     });
-    if(_sb) console.info('[VagasPro] Supabase conectado:', SUPABASE_URL);
-  } catch(e){ console.warn('[VagasPro] Supabase nao configurado — verifique as credenciais'); }
+    if(_sb) console.info('[VagasPro] Banco conectado:', SUPABASE_URL);
+  } catch(e){ console.warn('[VagasPro] Banco nao configurado — verifique as credenciais'); }
 }
 
 // ===== DATA =====
@@ -1329,13 +1523,14 @@ function navTo(page,el){
   document.getElementById('topbarTitle').textContent=PAGE_TITLES[page]||page;
   document.getElementById('mainContent').scrollTo(0,0);
   if(page==='vagas')filtrarVagas();
+  if(page==='cadastrar')_preencherPublicadoPor();
   if(page==='favoritos')renderFavoritos();
   if(page==='meus-interesses')renderInteresses();
   if(page==='noticias')renderNoticias('rh');
   if(page==='_sb')renderSQL();
   if(page==='dashboard')renderDashboard();
   if(page==='interessados')renderInteressados();
-  if(page==='usuarios')renderUsuarios();
+  if(page==='usuarios')carregarUsuarios();
   if(page==='configuracoes')renderConfig();
   if(page==='curriculo')updateCVPreview();
   if(page==='kanban')renderKanban();
@@ -1353,7 +1548,7 @@ function setLoginTab(tab,btn){
 
 // =====================================================
 // AUTENTICAÇÃO — VagasPro · Ciberic.Lab
-// Autentica exclusivamente via tabela usuarios no Supabase
+// Autentica exclusivamente via tabela usuarios
 // =====================================================
 
 function loginGoogle(){
@@ -1451,7 +1646,7 @@ async function doLogin(){
 
   if(!_sb){
     reBtn();
-    showToast('Banco de dados não configurado. Verifique as credenciais Supabase.','error');
+    showToast('Banco de dados não configurado. Verifique as credenciais.','error');
     return;
   }
 
@@ -1511,7 +1706,7 @@ async function doRegister(){
 
   if(!_sb){
     reBtn();
-    showToast('Banco de dados não configurado.','error');
+    showToast('Serviço temporariamente indisponível.','error');
     return;
   }
 
@@ -1581,6 +1776,22 @@ function resendCode(){
   }else{
     showToast('Sessão expirada. Tente criar a conta novamente.','error');
   }
+}
+
+function toggleSenha(inputId, btn) {
+  var inp = document.getElementById(inputId);
+  if (!inp) return;
+  var isPassword = inp.type === 'password';
+  inp.type = isPassword ? 'text' : 'password';
+  var svg = document.getElementById('eyeIcon_' + inputId);
+  if (svg) {
+    // Eye-off icon when showing password, eye icon when hiding
+    svg.innerHTML = isPassword
+      ? '<path d="M17.94 17.94A10.07 10.07 0 0112 20c-7 0-11-8-11-8a18.45 18.45 0 015.06-5.94M9.9 4.24A9.12 9.12 0 0112 4c7 0 11 8 11 8a18.5 18.5 0 01-2.16 3.19m-6.72-1.07a3 3 0 11-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/>'
+      : '<path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/>';
+  }
+  btn.style.color = isPassword ? 'var(--accent)' : 'var(--g400)';
+  inp.focus();
 }
 
 function showForgot(){
@@ -1663,6 +1874,34 @@ function signOutGoogle(){
   window.location.reload();
 }
 
+
+function _preencherPublicadoPor(){
+  var inp=document.getElementById('f-criado-por');
+  var info=document.getElementById('f-criado-info');
+  if(!inp||!currentUser)return;
+  var now=new Date();
+  var data=now.toLocaleDateString('pt-BR',{day:'2-digit',month:'2-digit',year:'numeric'});
+  var hora=now.toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'});
+  inp.value=currentUser.nome||currentUser.email||'';
+  if(info)info.textContent='📅 '+data+' às '+hora+' · '+(_nivelLabel(currentUser.nivel)||'');
+}
+function _nivelLabel(n){
+  return{superadmin:'SuperAdmin',admin:'Admin',supervisor:'Supervisor',
+    recrutador:'Recrutador',candidato:'Candidato'}[n]||n||'';
+}
+
+function showLogoutModal(){
+  var m=document.getElementById('logoutModal');
+  if(m){m.classList.add('open');m.style.display='flex';}
+}
+function fecharLogoutModal(){
+  var m=document.getElementById('logoutModal');
+  if(m){m.classList.remove('open');m.style.display='';}
+}
+function confirmarLogout(){
+  fecharLogoutModal();
+  signOutGoogle();
+}
 
 function applyPerms(nivel){
   const perms={
@@ -1962,6 +2201,55 @@ async function gerarCVComIA(){
   processarCVIA();
 }
 
+// ── CV PREVIEW MODAL ──────────────────────────────
+var _cvZoomLevel = 1.0;
+
+function abrirPreviewCV(){
+  updateCVPreview();
+  var src = document.getElementById('cvPagePreview');
+  var dst = document.getElementById('cvModalPage');
+  if(src && dst){
+    dst.innerHTML = src.innerHTML;
+    dst.style.cssText = src.style.cssText || '';
+    // Remove hidden positioning
+    dst.style.position = 'relative';
+    dst.style.left = '';
+    dst.style.top = '';
+    dst.style.transform = 'scale('+_cvZoomLevel+')';
+    dst.style.transformOrigin = 'top center';
+    // Adjust modal body height
+    var body = document.getElementById('cvModalBody');
+    if(body) body.style.paddingBottom = '40px';
+  }
+  _cvZoomLabel();
+  var modal = document.getElementById('cvPreviewModal');
+  if(modal){ modal.classList.add('open'); modal.scrollTop = 0; }
+}
+
+function fecharPreviewCV(){
+  var modal = document.getElementById('cvPreviewModal');
+  if(modal) modal.classList.remove('open');
+}
+
+function cvZoom(delta){
+  _cvZoomLevel = Math.min(1.6, Math.max(0.4, _cvZoomLevel + delta));
+  var page = document.getElementById('cvModalPage');
+  if(page){
+    page.style.transform = 'scale('+_cvZoomLevel+')';
+    page.style.transformOrigin = 'top center';
+    // Adjust wrapper height based on zoom
+    var h = page.offsetHeight * _cvZoomLevel;
+    page.style.marginBottom = (h - page.offsetHeight) + 'px';
+  }
+  _cvZoomLabel();
+}
+
+function _cvZoomLabel(){
+  var lbl = document.getElementById('cvZoomLabel');
+  if(lbl) lbl.textContent = Math.round(_cvZoomLevel*100)+'%';
+}
+// ─────────────────────────────────────────────────
+
 function exportarCVPDF(){
   const nome=document.getElementById('cv-nome')?.value||'curriculo';
   updateCVPreview();
@@ -2038,7 +2326,330 @@ function salvarPerfilRec(){const nome=document.getElementById('rec-nome').value.
 
 // ===== USERS =====
 const USERS_MOCK=[{nome:'Admin Geral',email:'admin'+'@'+'vagaspro.com.br',whatsapp:'(62) 99999-0001',nivel:'superadmin',status:'ativo',cadastro:'01/01/2025'},{nome:'Gestor RH',email:'gestor'+'@'+'vagaspro.com.br',whatsapp:'(62) 98888-1234',nivel:'admin',status:'ativo',cadastro:'15/02/2025'},{nome:'Recrutador Teste',email:'rec'+'@'+'empresa.com.br',whatsapp:'(62) 97777-5678',nivel:'recrutador',status:'ativo',cadastro:'20/03/2025'},{nome:'Supervisor',email:'supervisor'+'@'+'vagaspro.com.br',whatsapp:'(62) 96666-9012',nivel:'supervisor',status:'ativo',cadastro:'01/04/2025'},{nome:'João Candidato',email:'joao'+'@'+'email.com',whatsapp:'(62) 95555-1111',nivel:'candidato',status:'ativo',cadastro:'10/04/2025'},];
-function renderUsuarios(){const rl={superadmin:'SuperAdmin',admin:'Admin',supervisor:'Supervisor',recrutador:'Recrutador',candidato:'Candidato'};const rc={superadmin:'badge-blue',admin:'badge-amber',supervisor:'badge-gray',recrutador:'badge-green',candidato:'badge-gray'};document.getElementById('usuariosTableBody').innerHTML=USERS_MOCK.map(u=>`<tr><td><strong>${u.nome}</strong></td><td>${u.email}</td><td>${u.whatsapp}</td><td><span class="badge ${rc[u.nivel]}">${rl[u.nivel]}</span></td><td><span class="badge badge-green">${u.status}</span></td><td>${u.cadastro}</td><td><button class="btn btn-ghost btn-xs" onclick="showToast('Editar usuário em breve!','')">Editar</button></td></tr>`).join('');}
+function renderUsuarios(){
+  const rl={superadmin:'SuperAdmin',admin:'Admin',supervisor:'Supervisor',recrutador:'Recrutador',candidato:'Candidato'};
+  const rc={superadmin:'badge-blue',admin:'badge-amber',supervisor:'badge-gray',recrutador:'badge-green',candidato:'badge-gray'};
+  const sc={ativo:'badge-green',inativo:'badge-gray',suspenso:'badge-red'};
+  document.getElementById('usuariosTableBody').innerHTML=USERS_MOCK.map((u,i)=>`
+    <tr>
+      <td><div style="display:flex;align-items:center;gap:9px;">
+        <div style="width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,var(--accent),var(--purple));display:flex;align-items:center;justify-content:center;color:white;font-size:11px;font-weight:800;flex-shrink:0;">${u.nome.split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase()}</div>
+        <strong>${u.nome}</strong>
+      </div></td>
+      <td style="color:var(--g500);">${u.email}</td>
+      <td>${u.whatsapp||'–'}</td>
+      <td><span class="badge ${rc[u.nivel]}">${rl[u.nivel]}</span></td>
+      <td><span class="badge ${sc[u.status]||'badge-gray'}">${u.status}</span></td>
+      <td style="color:var(--g400);">${u.cadastro}</td>
+      <td>
+        <div style="display:flex;gap:5px;flex-wrap:wrap;">
+          <button class="btn btn-ghost btn-xs" onclick="abrirEditarUsuario(${i})" title="Editar">✏️ Editar</button>
+          <button class="btn btn-xs" onclick="toggleStatusUsuario(${i})" title="Ativar/Suspender"
+            style="background:${u.status==='ativo'?'var(--red-soft)':'var(--green-soft)'};color:${u.status==='ativo'?'var(--red2)':'var(--green2)'};border:1.5px solid ${u.status==='ativo'?'#fca5a5':'#86efac'};">
+            ${u.status==='ativo'?'🔴 Suspender':'🟢 Ativar'}
+          </button>
+          <button class="btn btn-xs" onclick="confirmarRemoverUsuario(${i})" title="Remover usuário"
+            style="background:var(--red-soft);color:var(--red2);border:1.5px solid #fca5a5;">
+            🗑️ Remover
+          </button>
+        </div>
+      </td>
+    </tr>`).join('');
+}
+
+// ── GESTÃO DE USUÁRIOS ────────────────────────────────
+async function carregarUsuarios(){
+  if(!_sb){renderUsuarios();return;}
+  try{
+    var res=await _sb.rpc('fn_admin_listar_usuarios');
+    if(!res.error&&res.data&&Array.isArray(res.data)&&res.data.length>0){
+      // Mapear dados do banco para o formato do mock
+      USERS_MOCK.length=0;
+      res.data.forEach(function(u){
+        USERS_MOCK.push({
+          id:u.id,
+          nome:u.nome||'',
+          email:u.email||'',
+          whatsapp:u.whatsapp||'',
+          nivel:u.nivel||'candidato',
+          status:u.status||'ativo',
+          email_verificado:u.email_verificado,
+          cadastro:u.created_at?new Date(u.created_at).toLocaleDateString('pt-BR'):''
+        });
+      });
+    }
+  }catch(e){
+    console.warn('[Usuários] Erro ao carregar:',e);
+  }
+  renderUsuarios();
+}
+
+// ── GESTÃO DE USUÁRIOS ────────────────────────────────
+var _editUserIdx = null;
+var _isNovoUsuario = false;
+
+function abrirNovoUsuario(){
+  _editUserIdx = null;
+  _isNovoUsuario = true;
+  // Reset all fields
+  ['eu-nome','eu-email','eu-whatsapp','eu-senha','eu-senha-conf'].forEach(function(id){
+    var el=document.getElementById(id);
+    if(el){el.value='';el.type=el.type||'text';}
+  });
+  var lvl=document.getElementById('eu-nivel');if(lvl)lvl.value='candidato';
+  var st=document.getElementById('eu-status');if(st)st.value='ativo';
+  // Update modal title/hint for "new" mode
+  var t=document.getElementById('editUserTitle');if(t)t.textContent='👤 Novo Usuário';
+  var s=document.getElementById('editUserSubtitle');if(s)s.textContent='Preencha os dados do novo usuário';
+  var h=document.getElementById('editUserHint');
+  if(h){h.className='hl hl-green';h.innerHTML='✅ O usuário receberá acesso imediato após o cadastro.';}
+  var lbl=document.getElementById('eu-senha-lbl');
+  if(lbl)lbl.innerHTML='Senha <span class="form-req">*</span>';
+  var btn=document.getElementById('editUserSaveBtn');if(btn)btn.textContent='➕ Criar Usuário';
+  var modal=document.getElementById('editUserModal');
+  if(modal)modal.classList.add('open');
+}
+
+function abrirEditarUsuario(idx){
+  const u=USERS_MOCK[idx];
+  if(!u)return;
+  _editUserIdx=idx;
+  _isNovoUsuario=false;
+  document.getElementById('eu-nome').value=u.nome||'';
+  document.getElementById('eu-email').value=u.email||'';
+  document.getElementById('eu-whatsapp').value=u.whatsapp||'';
+  document.getElementById('eu-nivel').value=u.nivel||'candidato';
+  document.getElementById('eu-status').value=u.status||'ativo';
+  // Clear password fields
+  var s=document.getElementById('eu-senha');if(s){s.value='';s.type='password';}
+  var sc=document.getElementById('eu-senha-conf');if(sc){sc.value='';sc.type='password';}
+  // Reset eye icons
+  ['eu-senha','eu-senha-conf'].forEach(function(id){
+    var ico=document.getElementById('eyeIcon_'+id);
+    if(ico)ico.innerHTML='<path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/>';
+  });
+  // Update modal title for "edit" mode
+  var t=document.getElementById('editUserTitle');if(t)t.textContent='✏️ Editar Usuário';
+  var sub=document.getElementById('editUserSubtitle');if(sub)sub.textContent='Altere os dados de '+u.nome;
+  var h=document.getElementById('editUserHint');
+  if(h){h.className='hl hl-amber';h.innerHTML='⚠️ Alterações no nível de acesso têm efeito imediato no próximo login. Deixe a senha em branco para mantê-la.';}
+  var lbl=document.getElementById('eu-senha-lbl');
+  if(lbl)lbl.innerHTML='Nova Senha <span style="color:var(--g400);font-weight:400;">(opcional)</span>';
+  var btn=document.getElementById('editUserSaveBtn');if(btn)btn.textContent='💾 Salvar Alterações';
+  var modal=document.getElementById('editUserModal');
+  if(modal)modal.classList.add('open');
+}
+
+function fecharEditarUsuario(){
+  const modal=document.getElementById('editUserModal');
+  if(modal)modal.classList.remove('open');
+  _editUserIdx=null;
+  _isNovoUsuario=false;
+}
+
+async function salvarEditarUsuario(){
+  var nome=(document.getElementById('eu-nome').value||'').trim();
+  var email=(document.getElementById('eu-email').value||'').trim().toLowerCase();
+  var whatsapp=(document.getElementById('eu-whatsapp').value||'').trim();
+  var nivel=document.getElementById('eu-nivel').value;
+  var status=document.getElementById('eu-status').value;
+  var senha=(document.getElementById('eu-senha').value||'');
+  var senhaConf=(document.getElementById('eu-senha-conf').value||'');
+
+  // Validação básica
+  if(!nome){showToast('Informe o nome completo.','error');return;}
+  if(!email||!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(email)){showToast('E-mail inválido.','error');return;}
+  if(senha&&senha.length<6){showToast('Senha deve ter ao menos 6 caracteres.','error');return;}
+  if(senha&&senha!==senhaConf){showToast('As senhas não coincidem.','error');return;}
+
+  var btn=document.getElementById('editUserSaveBtn');
+  if(btn){btn.disabled=true;btn.textContent='Salvando...';}
+  var reBtn=function(){if(btn){btn.disabled=false;btn.textContent=_isNovoUsuario?'➕ Criar Usuário':'💾 Salvar Alterações';}};
+
+  // ── NOVO USUÁRIO ────────────────────────────────────────────────
+  if(_isNovoUsuario){
+    if(!senha){showToast('Informe uma senha para o novo usuário.','error');reBtn();return;}
+    if(!_sb){showToast('Sem conexão com o banco de dados.','error');reBtn();return;}
+    try{
+      var res=await _sb.rpc('fn_auth_register',{p_nome:nome,p_email:email,p_senha:senha,p_nivel:nivel});
+      if(res.error||!res.data){
+        showToast((res.error&&res.error.message)||'Erro ao criar usuário.','error');
+        reBtn();return;
+      }
+      if(!res.data.ok){showToast(res.data.erro||'Erro ao criar usuário.','error');reBtn();return;}
+      // Atualizar whatsapp e status se necessário
+      if(res.data.id&&(whatsapp||status!=='ativo')){
+        await _sb.rpc('fn_atualizar_usuario',{
+          p_id:res.data.id,p_whatsapp:whatsapp||null,p_status:status,p_nivel:nivel
+        });
+      }
+      // Adicionar ao mock local para refletir na tela
+      var now=new Date();
+      USERS_MOCK.push({
+        id:res.data.id||'',
+        nome:nome,email:email,whatsapp:whatsapp,
+        nivel:nivel,status:status,
+        cadastro:now.toLocaleDateString('pt-BR',{day:'2-digit',month:'2-digit',year:'numeric'})
+      });
+      fecharEditarUsuario();
+      renderUsuarios();
+      showToast('✅ Usuário '+nome+' criado com sucesso!','success');
+    }catch(e){
+      showToast('Erro de conexão ao criar usuário.','error');
+      reBtn();
+    }
+    return;
+  }
+
+  // ── EDIÇÃO ──────────────────────────────────────────────────────
+  if(_editUserIdx===null){reBtn();return;}
+  var u=USERS_MOCK[_editUserIdx];
+  var userId=u.id||null;
+
+  if(!_sb){
+    // Sem banco: atualizar só o mock (modo offline)
+    u.nome=nome;u.email=email;u.whatsapp=whatsapp;u.nivel=nivel;u.status=status;
+    fecharEditarUsuario();renderUsuarios();
+    showToast('⚠️ Salvo localmente — sem conexão com banco.','warning');
+    reBtn();return;
+  }
+
+  if(!userId){
+    // Sem ID real: tenta buscar no banco pelo e-mail
+    try{
+      var found=await _sb.from('usuarios').select('id').eq('email',email).maybeSingle();
+      if(found.data)userId=found.data.id;
+    }catch(e){}
+  }
+
+  if(!userId){
+    showToast('Usuário não encontrado no banco. Verifique o e-mail.','error');
+    reBtn();return;
+  }
+
+  try{
+    // 1. Atualizar dados do usuário
+    var updRes=await _sb.rpc('fn_atualizar_usuario',{
+      p_id:userId,
+      p_nome:nome,
+      p_whatsapp:whatsapp||null,
+      p_nivel:nivel,
+      p_status:status,
+      p_nova_senha:senha||null
+    });
+
+    if(updRes.error){
+      showToast('Erro ao salvar: '+(updRes.error.message||'verifique as permissões.'),'error');
+      reBtn();return;
+    }
+    if(updRes.data&&!updRes.data.ok){
+      showToast(updRes.data.erro||'Erro ao atualizar usuário.','error');
+      reBtn();return;
+    }
+
+    // 2. Atualizar mock local para refletir na tela imediatamente
+    u.id=userId;
+    u.nome=nome;
+    u.email=email;
+    u.whatsapp=whatsapp;
+    u.nivel=nivel;
+    u.status=status;
+
+    fecharEditarUsuario();
+    renderUsuarios();
+    showToast('✅ Usuário '+nome+' atualizado'+(senha?' — nova senha salva!':' com sucesso!'),'success');
+  }catch(e){
+    showToast('Erro de conexão ao salvar.','error');
+    reBtn();
+  }
+}
+
+var _removeUserIdx = null;
+
+function confirmarRemoverUsuario(idx){
+  var u = USERS_MOCK[idx];
+  if(!u) return;
+  // Proteção: não pode remover a si mesmo
+  if(currentUser && u.email === currentUser.email){
+    showToast('Você não pode remover sua própria conta.','error');
+    return;
+  }
+  _removeUserIdx = idx;
+  var nameEl  = document.getElementById('removeUserName');
+  var emailEl = document.getElementById('removeUserEmail');
+  if(nameEl)  nameEl.textContent  = u.nome  || '–';
+  if(emailEl) emailEl.textContent = u.email || '–';
+  var modal = document.getElementById('removeUserModal');
+  if(modal) modal.classList.add('open');
+}
+
+function fecharRemoverUsuario(){
+  var modal = document.getElementById('removeUserModal');
+  if(modal) modal.classList.remove('open');
+  _removeUserIdx = null;
+}
+
+async function executarRemoverUsuario(){
+  if(_removeUserIdx === null) return;
+  var u = USERS_MOCK[_removeUserIdx];
+  if(!u) return;
+
+  var btn = document.getElementById('btnConfirmRemoveUser');
+  if(btn){ btn.disabled = true; btn.textContent = 'Removendo...'; }
+  var reBtn = function(){ if(btn){ btn.disabled = false; btn.textContent = 'Remover'; } };
+
+  // Tentar remover do banco
+  if(_sb && u.id){
+    try{
+      // Marcar como inativo/suspenso primeiro (soft delete)
+      var res = await _sb.rpc('fn_atualizar_usuario',{
+        p_id: u.id,
+        p_status: 'inativo'
+      });
+      if(res.error){
+        // Se falhou, tenta hard delete direto
+        var del = await _sb.from('usuarios').delete().eq('id', u.id);
+        if(del.error){
+          showToast('Erro ao remover: ' + (del.error.message || 'sem permissão.'), 'error');
+          reBtn(); return;
+        }
+      }
+    }catch(e){
+      showToast('Erro de conexão ao remover usuário.', 'error');
+      reBtn(); return;
+    }
+  } else if(_sb && !u.id){
+    // Sem ID: tenta buscar e deletar pelo email
+    try{
+      var found = await _sb.from('usuarios').select('id').eq('email', u.email).maybeSingle();
+      if(found.data){
+        await _sb.from('usuarios').delete().eq('id', found.data.id);
+      }
+    }catch(e){}
+  }
+
+  // Remover do mock local
+  USERS_MOCK.splice(_removeUserIdx, 1);
+  fecharRemoverUsuario();
+  renderUsuarios();
+  showToast('🗑️ Usuário ' + (u.nome || u.email) + ' removido.', 'success');
+}
+
+async function toggleStatusUsuario(idx){
+  const u=USERS_MOCK[idx];
+  if(!u)return;
+  const novoStatus=u.status==='ativo'?'suspenso':'ativo';
+  // Tentar gravar no banco
+  if(_sb&&u.id){
+    try{
+      await _sb.rpc('fn_atualizar_usuario',{p_id:u.id,p_status:novoStatus});
+    }catch(e){}
+  }
+  u.status=novoStatus;
+  renderUsuarios();
+  showToast(novoStatus==='ativo'?'🟢 Usuário ativado!':'🔴 Usuário suspenso!',novoStatus==='ativo'?'success':'warning');
+}
+// ─────────────────────────────────────────────────────
 
 // ===== NEWS =====
 const NOTICIAS={rh:[{fonte:'SEBRAE',titulo:'Tendências em recrutamento para 2025',tempo:'2h atrás',url:'https://sebrae.com.br'},{fonte:'Valor Econômico',titulo:'Mercado aquece com alta nas contratações',tempo:'3h atrás',url:'https://valor.com.br'},{fonte:'UOL',titulo:'Home office híbrido adotado por 70% das empresas',tempo:'5h atrás',url:'https://uol.com.br'},{fonte:'Terra',titulo:'Soft skills se tornam critério decisivo em seleção',tempo:'6h atrás',url:'https://terra.com.br'},{fonte:'Olhar Digital',titulo:'IA transforma RH com triagem automatizada',tempo:'8h atrás',url:'https://olhardigital.com.br'},{fonte:'SENAC',titulo:'Novas capacitações em gestão de pessoas disponíveis',tempo:'1d atrás',url:'https://senac.br'},],economia:[{fonte:'Valor Econômico',titulo:'PIB do Brasil cresce no 1º trimestre de 2025',tempo:'1h atrás',url:'https://valor.com.br'},{fonte:'UOL',titulo:'Inflação desacelera, mercado celebra queda dos juros',tempo:'2h atrás',url:'https://uol.com.br'},{fonte:'Terra',titulo:'Emprego formal bate recorde com 2,1 mi de vagas',tempo:'4h atrás',url:'https://terra.com.br'},{fonte:'Olhar Digital',titulo:'Startups captam R$ 3 bi e geram empregos em tech',tempo:'5h atrás',url:'https://olhardigital.com.br'},{fonte:'SEBRAE',titulo:'Micro empresas representam 52% dos empregos',tempo:'1d atrás',url:'https://sebrae.com.br'},],cursos:[{fonte:'SENAI',titulo:'Cursos gratuitos em eletricidade com certificado',tempo:'Hoje',url:'https://senai.br'},{fonte:'SENAC',titulo:'Capacitação gratuita em atendimento ao cliente',tempo:'Hoje',url:'https://senac.br'},{fonte:'SEBRAE',titulo:'Empreendedorismo digital: curso gratuito disponível',tempo:'Hoje',url:'https://sebrae.com.br'},{fonte:'Olhar Digital',titulo:'Google: 25 cursos gratuitos com certificado em 2025',tempo:'2h atrás',url:'https://olhardigital.com.br'},{fonte:'Terra',titulo:'Cursos de informática gratuitos no Pronatec',tempo:'3h atrás',url:'https://terra.com.br'},{fonte:'SENAI',titulo:'Mecânica industrial: vagas abertas para qualificação',tempo:'1d atrás',url:'https://senai.br'},],mercado:[{fonte:'Olhar Digital',titulo:'Tecnologia lidera abertura de vagas em 2025',tempo:'1h atrás',url:'https://olhardigital.com.br'},{fonte:'UOL',titulo:'Saúde e bem-estar crescem 18% em empregos formais',tempo:'2h atrás',url:'https://uol.com.br'},{fonte:'Terra',titulo:'Goiás registra menor desemprego do Centro-Oeste',tempo:'4h atrás',url:'https://terra.com.br'},{fonte:'Valor Econômico',titulo:'Construção civil retoma força com infraestrutura',tempo:'5h atrás',url:'https://valor.com.br'},{fonte:'SEBRAE',titulo:'Alimentação lidera contratações no interior do Brasil',tempo:'8h atrás',url:'https://sebrae.com.br'},]};
@@ -2067,10 +2678,10 @@ function exportarCSVCandidatos(vagaId){let cands=vagaId?CANDS_MOCK.filter(c=>c.v
 function exportarPDF(){window.print();showToast('🖨️ Use Ctrl+P para salvar como PDF','info');}
 
 // ===== SQL =====
-const SQL_TXT=`-- VagasPro v4 · Ciberic.Lab · cibericlab'+'@'+'gmail.com
+const SQL_TXT=`-- VagasPro v4 · Ciberic.Lab'+'@'+'gmail.com
 -- Script de Banco de Dados Completo
 -- Execute no SQL Editor do painel de banco de dados
--- Compatível com PostgreSQL / Supabase
+-- Compatível com PostgreSQL
 
 CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
 CREATE EXTENSION IF NOT EXISTS "pg_trgm";
@@ -2411,7 +3022,7 @@ ON CONFLICT(email) DO NOTHING;
 
 function renderSQL(){document.getElementById('sqlBlock').textContent=SQL_TXT;}
 function copiarSQL(){navigator.clipboard.writeText(SQL_TXT).then(()=>showToast('✅ SQL copiado!','success'));}
-function exportarSQLFile(){const blob=new Blob([SQL_TXT],{type:'text/plain'});const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='vagaspro_v3_supabase.sql';a.click();showToast('✅ SQL baixado!','success');}
+function exportarSQLFile(){const blob=new Blob([SQL_TXT],{type:'text/plain'});const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='vagaspro_banco.sql';a.click();showToast('✅ SQL baixado!','success');}
 
 // ===== TOAST / NOTIFICATION =====
 var _toastQueue = [];
@@ -2825,6 +3436,12 @@ function editarVaga(id){
     (v[km[field]]||[]).forEach(val=>{tagsData[field].push(val);const el=document.createElement('div');el.className='ti';el.innerHTML=`${val}<button type="button" onclick="removeTag(this,'${field}','${val.replace(/'/g,"\'")}')">×</button>`;wrap.insertBefore(el,inp);});
   });
   navTo('cadastrar',document.getElementById('nav-cadastrar'));
+  // Update info display for editing
+  var _info=document.getElementById('f-criado-info');
+  if(_info&&v.criado_por){
+    var _now=new Date();
+    _info.textContent='✏️ Editando vaga de: '+v.criado_por;
+  }
   showToast('✏️ Editando: '+v.titulo,'info');
   const ft=document.getElementById('formVagaTitle');
   if(ft)ft.innerHTML='✏️ Editando Vaga <span style="color:var(--amber);font-size:13px;">(modo edição)</span>';
@@ -2832,9 +3449,26 @@ function editarVaga(id){
 }
 function removerVaga(id){
   const v=vagasLocal.find(x=>x.id===id);if(!v)return;
-  if(!confirm('Remover a vaga "'+v.titulo+'"?\nEsta ação não pode ser desfeita.'))return;
-  vagasLocal=vagasLocal.filter(x=>x.id!==id);filtrarVagas();
+  _vagaRemoverId=id;
+  var modal=document.getElementById('removeVagaModal');
+  var lbl=document.getElementById('removeVagaLabel');
+  if(lbl)lbl.textContent=v.titulo;
+  if(modal){modal.classList.add('open');modal.style.display='flex';}
+}
+var _vagaRemoverId=null;
+function confirmarRemoverVaga(){
+  var modal=document.getElementById('removeVagaModal');
+  if(modal){modal.classList.remove('open');modal.style.display='';}
+  if(_vagaRemoverId===null)return;
+  vagasLocal=vagasLocal.filter(x=>x.id!==_vagaRemoverId);
+  _vagaRemoverId=null;
+  filtrarVagas();
   showToast('🗑️ Vaga removida!','success');
+}
+function fecharRemoverModal(){
+  var modal=document.getElementById('removeVagaModal');
+  if(modal){modal.classList.remove('open');modal.style.display='';}
+  _vagaRemoverId=null;
 }
 
 // ===== OVERRIDE salvarVaga para edição =====
@@ -2879,6 +3513,7 @@ function limparForm(){
   if(ft)ft.innerHTML='📋 Dados da Vaga';
   const mc=document.getElementById('f-max-candidatos');if(mc)mc.value='';
   const cp=document.getElementById('f-criado-por');if(cp)cp.value='';
+  setTimeout(_preencherPublicadoPor,50);
 }
 
 // ===== VERIFICAR LIMITES DE CANDIDATOS =====
@@ -2892,7 +3527,7 @@ function checkLimites(){
 }
 
 // ===== KEYBOARD =====
-document.addEventListener('keydown',e=>{if(e.key==='Escape'){fecharModal();document.getElementById('verifyOverlay')?.classList.remove('open');document.getElementById('feedbackOverlay')?.classList.remove('open');}});
+document.addEventListener('keydown',e=>{if(e.key==='Escape'){fecharModal();fecharPreviewCV();fecharLogoutModal();fecharRemoverModal();fecharEditarUsuario();fecharRemoverUsuario();document.getElementById('verifyOverlay')?.classList.remove('open');document.getElementById('feedbackOverlay')?.classList.remove('open');}});
 
 // ===== PWA =====
 if('serviceWorker' in navigator){
@@ -2911,8 +3546,8 @@ window.addEventListener('beforeinstallprompt',e=>{
 
 // ===== INIT =====
 (function init(){
-  // Inicializar Supabase e configurações
-  initSupabase();
+  // Inicializar banco e configurações
+  initDB();
   setTimeout(inicializarGoogle, 1500);
 
   // Restaurar sessão salva (sessionStorage tem prioridade, depois localStorage)
