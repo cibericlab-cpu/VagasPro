@@ -1267,22 +1267,22 @@ window.onerror = function(msg, src, line, col, err) {
 // Substitua pelas suas credenciais do painel Supabase:
 // Settings > API > Project URL e anon public key
 // ═══════════════════════════════════════════════════════════
-const SUPABASE_URL  = 'https://wsvqzagbulfufyqowwfx.supabase.co';
+const SUPABASE_URL  = 'https://wsvqzagbulfufyqowwfx._sb.co';
 const SUPABASE_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6IndzdnF6YWdidWxmdWZ5cW93d2Z4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzU1MTYwNzgsImV4cCI6MjA5MTA5MjA3OH0.Nat7Ba1pzzYJDM8jZoZqg_D7rg8Kb4v7Cnzq1uU005Q';
-let supabase = null;
+let _sb = null;
 
 // Inicializa cliente Supabase (se credenciais configuradas)
 function initSupabase(){
   try{
     if(!SUPABASE_URL || !SUPABASE_URL.startsWith('https://') || SUPABASE_URL.includes('SEU-PROJETO')) return;
-    supabase = window.supabase?.createClient(SUPABASE_URL, SUPABASE_ANON, {
+    _sb = window.supabase?.createClient(SUPABASE_URL, SUPABASE_ANON, {
       auth: {
         autoRefreshToken: true,
         persistSession: false,
         detectSessionInUrl: false
       }
     });
-    if(supabase) console.info('[VagasPro] Supabase conectado:', SUPABASE_URL);
+    if(_sb) console.info('[VagasPro] Supabase conectado:', SUPABASE_URL);
   } catch(e){ console.warn('[VagasPro] Supabase nao configurado — verifique as credenciais'); }
 }
 
@@ -1317,7 +1317,7 @@ let cvExps=[];let cvEdus=[];
 let cvFotoData=null;
 
 // ===== NAV =====
-const PAGE_TITLES={dashboard:'Dashboard',vagas:'Vagas em Aberto',cadastrar:'Cadastrar Nova Vaga',favoritos:'Vagas Favoritas','meus-interesses':'Meus Interesses',curriculo:'Fazer Currículo com IA',interessados:'Candidatos por Vaga','perfil-rec':'Perfil da Empresa',empresas:'Empresas',alertas:'Alertas',usuarios:'Usuários',noticias:'Notícias',configuracoes:'Configurações',supabase:'Banco de Dados'};
+const PAGE_TITLES={dashboard:'Dashboard',vagas:'Vagas em Aberto',cadastrar:'Cadastrar Nova Vaga',favoritos:'Vagas Favoritas','meus-interesses':'Meus Interesses',curriculo:'Fazer Currículo com IA',interessados:'Candidatos por Vaga','perfil-rec':'Perfil da Empresa',empresas:'Empresas',alertas:'Alertas',usuarios:'Usuários',noticias:'Notícias',configuracoes:'Configurações',_sb:'Banco de Dados'};
 
 function navTo(page,el){
   document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
@@ -1332,7 +1332,7 @@ function navTo(page,el){
   if(page==='favoritos')renderFavoritos();
   if(page==='meus-interesses')renderInteresses();
   if(page==='noticias')renderNoticias('rh');
-  if(page==='supabase')renderSQL();
+  if(page==='_sb')renderSQL();
   if(page==='dashboard')renderDashboard();
   if(page==='interessados')renderInteressados();
   if(page==='usuarios')renderUsuarios();
@@ -1385,9 +1385,9 @@ function inicializarGoogle(){
 // Busca perfil real na tabela usuarios e faz login
 async function _loginComPerfil(email, nomeGoogle, avatar){
   if(!email){showToast('E-mail não obtido.','error');return;}
-  if(supabase){
+  if(_sb){
     try{
-      var res=await supabase.from('usuarios')
+      var res=await _sb.from('usuarios')
         .select('id,nome,nivel,status')
         .eq('email',email).eq('status','ativo').maybeSingle();
       if(res.data){
@@ -1449,7 +1449,7 @@ async function doLogin(){
   if(btn){btn.disabled=true;btn.textContent='Verificando...';}
   var reBtn=function(){if(btn){btn.disabled=false;btn.textContent='Entrar na plataforma →';}};
 
-  if(!supabase){
+  if(!_sb){
     reBtn();
     showToast('Banco de dados não configurado. Verifique as credenciais Supabase.','error');
     return;
@@ -1457,7 +1457,7 @@ async function doLogin(){
 
   try{
     // Tentativa 1: fn_auth_login (verifica hash bcrypt)
-    var rpc=await supabase.rpc('fn_auth_login',{p_email:email,p_senha:senha});
+    var rpc=await _sb.rpc('fn_auth_login',{p_email:email,p_senha:senha});
     if(!rpc.error&&rpc.data&&rpc.data.ok){
       reBtn();
       fazerLogin({id:rpc.data.id,nome:_sanitize(rpc.data.nome||''),
@@ -1471,7 +1471,7 @@ async function doLogin(){
       return;
     }
     // RPC com erro técnico → tenta busca direta
-    var direct=await supabase.from('usuarios')
+    var direct=await _sb.from('usuarios')
       .select('id,nome,nivel,status')
       .eq('email',email).eq('status','ativo').maybeSingle();
     if(!direct.error&&direct.data){
@@ -1509,14 +1509,14 @@ async function doRegister(){
   if(btn){btn.disabled=true;btn.textContent='Criando conta...';}
   var reBtn=function(){if(btn){btn.disabled=false;btn.textContent='Criar minha conta grátis →';}};
 
-  if(!supabase){
+  if(!_sb){
     reBtn();
     showToast('Banco de dados não configurado.','error');
     return;
   }
 
   try{
-    var res=await supabase.rpc('fn_auth_register',{p_nome:nome,p_email:email,p_senha:senha,p_nivel:nivel});
+    var res=await _sb.rpc('fn_auth_register',{p_nome:nome,p_email:email,p_senha:senha,p_nivel:nivel});
     reBtn();
     if(res.error||!res.data){showToast((res.error&&res.error.message)||'Erro ao criar conta.','error');return;}
     if(!res.data.ok){showToast(res.data.erro||'Não foi possível criar a conta.','error');return;}
@@ -1531,8 +1531,8 @@ async function doRegister(){
 var _pendingRegister=null;
 
 async function _mostrarVerificacao(userId,email){
-  if(supabase&&userId){
-    try{await supabase.rpc('fn_gerar_codigo_verificacao',{p_usuario_id:userId});}catch(e){}
+  if(_sb&&userId){
+    try{await _sb.rpc('fn_gerar_codigo_verificacao',{p_usuario_id:userId});}catch(e){}
   }
   document.getElementById('verifyEmailShow').textContent=email;
   document.getElementById('verifyOverlay').classList.add('open');
@@ -1553,9 +1553,9 @@ async function verifyCode(){
   var reg=_pendingRegister;
   if(!reg){showToast('Sessão expirada. Tente criar a conta novamente.','error');return;}
 
-  if(supabase&&reg.id){
+  if(_sb&&reg.id){
     try{
-      var res=await supabase.rpc('fn_validar_codigo',{p_usuario_id:reg.id,p_codigo:entered});
+      var res=await _sb.rpc('fn_validar_codigo',{p_usuario_id:reg.id,p_codigo:entered});
       if(!res.data){
         showToast('Código inválido ou expirado.','error');
         for(var i=0;i<6;i++){var ci=document.getElementById('c'+i);if(ci){ci.value='';ci.classList.remove('filled');}}
@@ -1576,7 +1576,7 @@ async function verifyCode(){
 }
 
 function resendCode(){
-  if(_pendingRegister&&_pendingRegister.id&&supabase){
+  if(_pendingRegister&&_pendingRegister.id&&_sb){
     _mostrarVerificacao(_pendingRegister.id,_pendingRegister.email);
   }else{
     showToast('Sessão expirada. Tente criar a conta novamente.','error');
@@ -1597,9 +1597,9 @@ function backCode(el,e,p){
 
 async function fazerLogin(user){
   // Buscar nível real no banco se disponível
-  if(supabase&&user.email&&!user.id){
+  if(_sb&&user.email&&!user.id){
     try{
-      var r=await supabase.from('usuarios')
+      var r=await _sb.from('usuarios')
         .select('id,nome,nivel,status').eq('email',user.email).eq('status','ativo').maybeSingle();
       if(r.data){user.nivel=r.data.nivel;user.id=r.data.id;user.nome=_sanitize(r.data.nome)||user.nome;}
     }catch(e){}
@@ -1659,14 +1659,14 @@ function signOutGoogle(){
   if(typeof gapi!=='undefined'&&gapi.auth2){
     try{gapi.auth2.getAuthInstance().signOut();}catch(e){}
   }
-  if(supabase){try{supabase.auth.signOut();}catch(e){}}
+  if(_sb){try{_sb.auth.signOut();}catch(e){}}
   window.location.reload();
 }
 
 
 function applyPerms(nivel){
   const perms={
-    superadmin:['dashboard','vagas','cadastrar','favoritos','meus-interesses','kanban','curriculo','interessados','perfil-rec','empresas','alertas','usuarios','noticias','configuracoes','supabase'],
+    superadmin:['dashboard','vagas','cadastrar','favoritos','meus-interesses','kanban','curriculo','interessados','perfil-rec','empresas','alertas','usuarios','noticias','configuracoes','_sb'],
     admin:['dashboard','vagas','cadastrar','favoritos','kanban','interessados','perfil-rec','empresas','alertas','usuarios','noticias','configuracoes'],
     supervisor:['dashboard','vagas','favoritos','kanban','interessados','alertas','noticias','configuracoes'],
     recrutador:['dashboard','vagas','cadastrar','kanban','perfil-rec','alertas','noticias'],
@@ -2046,7 +2046,7 @@ function renderNoticias(tab){document.getElementById('newsGrid').innerHTML=(NOTI
 function setNewsTab(tab,btn){document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));btn.classList.add('active');renderNoticias(tab);}
 
 // ===== CONFIG =====
-const ABAS_LIST=[{key:'dashboard',label:'Dashboard',ico:'📊'},{key:'vagas',label:'Vagas',ico:'💼'},{key:'cadastrar',label:'Cadastrar Vaga',ico:'➕'},{key:'favoritos',label:'Favoritos',ico:'♥'},{key:'meus-interesses',label:'Meus Interesses',ico:'⭐'},{key:'curriculo',label:'Fazer Currículo',ico:'📄'},{key:'interessados',label:'Candidatos',ico:'👥'},{key:'perfil-rec',label:'Perfil Empresa',ico:'🏢'},{key:'empresas',label:'Empresas',ico:'🏭'},{key:'alertas',label:'Alertas',ico:'🔔'},{key:'usuarios',label:'Usuários',ico:'👤'},{key:'noticias',label:'Notícias',ico:'📰'},{key:'supabase',label:'SQL Supabase',ico:'🗄️'},];
+const ABAS_LIST=[{key:'dashboard',label:'Dashboard',ico:'📊'},{key:'vagas',label:'Vagas',ico:'💼'},{key:'cadastrar',label:'Cadastrar Vaga',ico:'➕'},{key:'favoritos',label:'Favoritos',ico:'♥'},{key:'meus-interesses',label:'Meus Interesses',ico:'⭐'},{key:'curriculo',label:'Fazer Currículo',ico:'📄'},{key:'interessados',label:'Candidatos',ico:'👥'},{key:'perfil-rec',label:'Perfil Empresa',ico:'🏢'},{key:'empresas',label:'Empresas',ico:'🏭'},{key:'alertas',label:'Alertas',ico:'🔔'},{key:'usuarios',label:'Usuários',ico:'👤'},{key:'noticias',label:'Notícias',ico:'📰'},{key:'_sb',label:'SQL Supabase',ico:'🗄️'},];
 const NIVEIS=['superadmin','admin','supervisor','recrutador','candidato'];
 const NL={superadmin:'SuperAdmin',admin:'Admin',supervisor:'Supervisor',recrutador:'Recrutador',candidato:'Candidato'};
 function isAllowed(key,n){const d={superadmin:true,admin:['dashboard','vagas','cadastrar','favoritos','interessados','perfil-rec','empresas','alertas','usuarios','noticias','configuracoes'].includes(key),supervisor:['dashboard','vagas','favoritos','interessados','alertas','noticias'].includes(key),recrutador:['dashboard','vagas','cadastrar','favoritos','interessados','perfil-rec','alertas','noticias'].includes(key),candidato:['dashboard','vagas','favoritos','meus-interesses','curriculo','alertas','noticias'].includes(key)};return d[n]||false;}
