@@ -33,20 +33,20 @@ const VAGAS_DB=[
   {id:1,titulo:'Cozinheiro(a)',empresa:'Empório do Lago',setor:'Alimentação',tipo:'CLT',cidade:'Goiânia',estado:'GO',salario:'R$ 1.800,00',jornada:'Escala 6x1 – 16h às 22h',status:'aberto',destaque:'Venha fazer parte de uma equipe apaixonada por sabores!',requisitos:['Ensino fundamental','Experiência em restaurante','Disposição para aprender','Trabalho em equipe','Pontualidade'],atividades:['Preparar pratos do menu','Manter higiene da cozinha','Controlar estoque'],beneficios:['Vale transporte ou combustível','Refeição na empresa','Seguro de vida','Plano de saúde','Plano odontológico','Prêmio por assiduidade'],whatsapp:'(62) 98459-1750',email:'',logo:'🍳',dias:2,favorito:false,interesse:false,interessados:3,criado_por:'Empório do Lago',max_candidatos:null},
   {id:2,titulo:'Auxiliar de Serviços Gerais',empresa:'Empório do Lago',setor:'Alimentação',tipo:'CLT',cidade:'Goiânia',estado:'GO',salario:'R$ 1.700,00',jornada:'Escala 6x1 – 09h às 18h',status:'aberto',destaque:'',requisitos:['Ensino fundamental','Noções de limpeza','Trabalho em equipe'],atividades:['Limpeza e organização','Apoio geral'],beneficios:['Vale transporte','Refeição','Seguro de vida','Plano de saúde'],whatsapp:'(62) 98459-1750',email:'',logo:'🧹',dias:2,favorito:false,interesse:false,interessados:1,criado_por:'Empório do Lago',max_candidatos:20},
   {id:3,titulo:'Atendente de Caixa e Recepção',empresa:'Empório do Lago',setor:'Alimentação',tipo:'CLT',cidade:'Goiânia',estado:'GO',salario:'R$ 1.800 → R$ 2.000',jornada:'Escala 6x1 – 09h às 18h',status:'urgente',destaque:'Crescimento salarial após 90 dias!',requisitos:['Ensino médio','Noções de informática','Boa comunicação'],atividades:['Atendimento ao cliente','Operação do caixa'],beneficios:['Vale transporte','Refeição','Seguro de vida','Plano de saúde'],whatsapp:'(62) 98459-1750',email:'',logo:'🛒',dias:2,favorito:false,interesse:false,interessados:7,criado_por:'Empório do Lago',max_candidatos:10},
-  {id:4,titulo:'Supervisor de Funilaria',empresa:'Viação Reunidas',setor:'Manutenção',tipo:'CLT',cidade:'Goiânia',estado:'GO',salario:'A combinar',jornada:'Disponibilidade de horário',status:'aberto',destaque:'Lidere uma equipe de alta performance!',requisitos:['Experiência com funilaria','Liderança de equipe'],atividades:['Supervisionar funilaria e pintura','Liderar equipe'],beneficios:['VA: R$ 1.146,00','VT: 100%','Plano de saúde'],whatsapp:'',email:'soutalento@viacaoreunidas-go.com.br',logo:'🚌',dias:5,favorito:false,interesse:false,interessados:2,criado_por:'Viação Reunidas',max_candidatos:null},
-  {id:5,titulo:'Supervisor de Mecânica',empresa:'Viação Reunidas',setor:'Manutenção',tipo:'CLT',cidade:'Goiânia',estado:'GO',salario:'A combinar',jornada:'Disponibilidade de horário',status:'aberto',destaque:'',requisitos:['Experiência com veículos pesados','Liderança'],atividades:['Supervisionar manutenção da frota'],beneficios:['VA: R$ 1.146,00','VT: 100%','Plano de saúde'],whatsapp:'',email:'soutalento@viacaoreunidas-go.com.br',logo:'🔧',dias:5,favorito:false,interesse:false,interessados:4,criado_por:'Viação Reunidas',max_candidatos:null},
-  {id:6,titulo:'Supervisor de Elétrica Veicular',empresa:'Viação Reunidas',setor:'Manutenção',tipo:'CLT',cidade:'Goiânia',estado:'GO',salario:'A combinar',jornada:'Disponibilidade de horário',status:'urgente',destaque:'',requisitos:['Experiência com elétrica veicular','Liderança','Diagnóstico elétrico'],atividades:['Supervisionar manutenção elétrica','Diagnóstico de falhas'],beneficios:['VA: R$ 1.146,00','VT: 100%','Plano de saúde'],whatsapp:'',email:'soutalento@viacaoreunidas-go.com.br',logo:'⚡',dias:5,favorito:false,interesse:false,interessados:3,criado_por:'Viação Reunidas',max_candidatos:8},
-  {id:7,titulo:'Auxiliar de Produção – Dermato',empresa:'Manipularte Farmácia',setor:'Saúde',tipo:'CLT',cidade:'Goiânia',estado:'GO',salario:'Salário fixo',jornada:'44 horas semanais',status:'aberto',destaque:'Venha fazer parte do nosso TIME!',requisitos:['Ensino médio completo','Preferencialmente estudante de Farmácia','Atenção aos detalhes'],atividades:['Produção dermatológica','Controle de qualidade'],beneficios:['Plano de saúde','Plano odontológico'],whatsapp:'(62) 9862-0660',email:'rh@manipularte.com.br',logo:'💊',dias:1,favorito:false,interesse:false,interessados:9,criado_por:'Manipularte Farmácia',max_candidatos:10},
-  {id:8,titulo:'Assistente de RH',empresa:'Pacto Soluções',setor:'RH',tipo:'CLT',cidade:'Goiânia',estado:'GO',salario:'R$ 2.500,00',jornada:'08h às 18h – seg a sex',status:'aberto',destaque:'Junte-se a uma empresa que transforma vidas!',requisitos:['Superior em Psicologia ou Administração','Conhecimento em RH','Informática intermediária'],atividades:['Recrutamento e seleção','Desenvolvimento de pessoas'],beneficios:['R$ 2.500,00','Cartão alimentação','Plano de saúde','VT','Wellhub','Day off Aniversário'],whatsapp:'+55629181912085',email:'talentos@pactosolucoes.com.br',logo:'👥',dias:3,favorito:false,interesse:false,interessados:12,criado_por:'Pacto Soluções',max_candidatos:15},
-  {id:9,titulo:'Operador de Moagem',empresa:'Apoiar RH – Indústria',setor:'Indústria',tipo:'CLT',cidade:'Goiânia',estado:'GO',salario:'R$ 2.663,85',jornada:'Escala 12x36 – 19h às 07h',status:'urgente',destaque:'Excelente pacote de benefícios!',requisitos:['Experiência como Operador de Máquinas Industriais'],atividades:['Operação de moagem industrial','Controle de produção'],beneficios:['Assiduidade: R$ 266,00','Cesta de Alimentos','Plano de saúde','VT'],whatsapp:'(62) 99347-2725',email:'rh5@apoiarh.com.br',logo:'⚙️',dias:7,favorito:false,interesse:false,interessados:6,criado_por:'Apoiar RH',max_candidatos:null},
+  {id:4,titulo:'Supervisor de Funilaria',empresa:'Viação Reunidas',setor:'Manutenção',tipo:'CLT',cidade:'Goiânia',estado:'GO',salario:'A combinar',jornada:'Disponibilidade de horário',status:'aberto',destaque:'Lidere uma equipe de alta performance!',requisitos:['Experiência com funilaria','Liderança de equipe'],atividades:['Supervisionar funilaria e pintura','Liderar equipe'],beneficios:['VA: R$ 1.146,00','VT: 100%','Plano de saúde'],whatsapp:'',email:'soutalento'+'@'+'viacaoreunidas-go.com.br',logo:'🚌',dias:5,favorito:false,interesse:false,interessados:2,criado_por:'Viação Reunidas',max_candidatos:null},
+  {id:5,titulo:'Supervisor de Mecânica',empresa:'Viação Reunidas',setor:'Manutenção',tipo:'CLT',cidade:'Goiânia',estado:'GO',salario:'A combinar',jornada:'Disponibilidade de horário',status:'aberto',destaque:'',requisitos:['Experiência com veículos pesados','Liderança'],atividades:['Supervisionar manutenção da frota'],beneficios:['VA: R$ 1.146,00','VT: 100%','Plano de saúde'],whatsapp:'',email:'soutalento'+'@'+'viacaoreunidas-go.com.br',logo:'🔧',dias:5,favorito:false,interesse:false,interessados:4,criado_por:'Viação Reunidas',max_candidatos:null},
+  {id:6,titulo:'Supervisor de Elétrica Veicular',empresa:'Viação Reunidas',setor:'Manutenção',tipo:'CLT',cidade:'Goiânia',estado:'GO',salario:'A combinar',jornada:'Disponibilidade de horário',status:'urgente',destaque:'',requisitos:['Experiência com elétrica veicular','Liderança','Diagnóstico elétrico'],atividades:['Supervisionar manutenção elétrica','Diagnóstico de falhas'],beneficios:['VA: R$ 1.146,00','VT: 100%','Plano de saúde'],whatsapp:'',email:'soutalento'+'@'+'viacaoreunidas-go.com.br',logo:'⚡',dias:5,favorito:false,interesse:false,interessados:3,criado_por:'Viação Reunidas',max_candidatos:8},
+  {id:7,titulo:'Auxiliar de Produção – Dermato',empresa:'Manipularte Farmácia',setor:'Saúde',tipo:'CLT',cidade:'Goiânia',estado:'GO',salario:'Salário fixo',jornada:'44 horas semanais',status:'aberto',destaque:'Venha fazer parte do nosso TIME!',requisitos:['Ensino médio completo','Preferencialmente estudante de Farmácia','Atenção aos detalhes'],atividades:['Produção dermatológica','Controle de qualidade'],beneficios:['Plano de saúde','Plano odontológico'],whatsapp:'(62) 9862-0660',email:'rh'+'@'+'manipularte.com.br',logo:'💊',dias:1,favorito:false,interesse:false,interessados:9,criado_por:'Manipularte Farmácia',max_candidatos:10},
+  {id:8,titulo:'Assistente de RH',empresa:'Pacto Soluções',setor:'RH',tipo:'CLT',cidade:'Goiânia',estado:'GO',salario:'R$ 2.500,00',jornada:'08h às 18h – seg a sex',status:'aberto',destaque:'Junte-se a uma empresa que transforma vidas!',requisitos:['Superior em Psicologia ou Administração','Conhecimento em RH','Informática intermediária'],atividades:['Recrutamento e seleção','Desenvolvimento de pessoas'],beneficios:['R$ 2.500,00','Cartão alimentação','Plano de saúde','VT','Wellhub','Day off Aniversário'],whatsapp:'+55629181912085',email:'talentos'+'@'+'pactosolucoes.com.br',logo:'👥',dias:3,favorito:false,interesse:false,interessados:12,criado_por:'Pacto Soluções',max_candidatos:15},
+  {id:9,titulo:'Operador de Moagem',empresa:'Apoiar RH – Indústria',setor:'Indústria',tipo:'CLT',cidade:'Goiânia',estado:'GO',salario:'R$ 2.663,85',jornada:'Escala 12x36 – 19h às 07h',status:'urgente',destaque:'Excelente pacote de benefícios!',requisitos:['Experiência como Operador de Máquinas Industriais'],atividades:['Operação de moagem industrial','Controle de produção'],beneficios:['Assiduidade: R$ 266,00','Cesta de Alimentos','Plano de saúde','VT'],whatsapp:'(62) 99347-2725',email:'rh5'+'@'+'apoiarh.com.br',logo:'⚙️',dias:7,favorito:false,interesse:false,interessados:6,criado_por:'Apoiar RH',max_candidatos:null},
 ];
 
 const CANDS_MOCK=[
-  {nome:'Ana Lima',email:'ana@email.com',whatsapp:'(62) 99111-2222',vaga_id:7,cargo:'Auxiliar de Produção',exp:'1 ano em farmácia de manipulação',dias:1,status:'novo'},
-  {nome:'Carlos Souza',email:'carlos@email.com',whatsapp:'(62) 99333-4444',vaga_id:7,cargo:'Estudante de Farmácia',exp:'Sem experiência, cursando 3º período',dias:2,status:'contato'},
-  {nome:'Fernanda Rocha',email:'fern@email.com',whatsapp:'(62) 99555-6666',vaga_id:8,cargo:'Estudante de Psicologia',exp:'Estágio em RH por 6 meses',dias:1,status:'entrevista'},
-  {nome:'João Melo',email:'joao@email.com',whatsapp:'(62) 99777-8888',vaga_id:3,cargo:'Operador de Caixa',exp:'2 anos em supermercado',dias:3,status:'novo'},
-  {nome:'Mariana Costa',email:'mari@email.com',whatsapp:'(62) 99999-0000',vaga_id:1,cargo:'Cozinheira',exp:'3 anos em restaurante italiano',dias:4,status:'contratado'},
+  {nome:'Ana Lima',email:'ana'+'@'+'email.com',whatsapp:'(62) 99111-2222',vaga_id:7,cargo:'Auxiliar de Produção',exp:'1 ano em farmácia de manipulação',dias:1,status:'novo'},
+  {nome:'Carlos Souza',email:'carlos'+'@'+'email.com',whatsapp:'(62) 99333-4444',vaga_id:7,cargo:'Estudante de Farmácia',exp:'Sem experiência, cursando 3º período',dias:2,status:'contato'},
+  {nome:'Fernanda Rocha',email:'fern'+'@'+'email.com',whatsapp:'(62) 99555-6666',vaga_id:8,cargo:'Estudante de Psicologia',exp:'Estágio em RH por 6 meses',dias:1,status:'entrevista'},
+  {nome:'João Melo',email:'joao'+'@'+'email.com',whatsapp:'(62) 99777-8888',vaga_id:3,cargo:'Operador de Caixa',exp:'2 anos em supermercado',dias:3,status:'novo'},
+  {nome:'Mariana Costa',email:'mari'+'@'+'email.com',whatsapp:'(62) 99999-0000',vaga_id:1,cargo:'Cozinheira',exp:'3 anos em restaurante italiano',dias:4,status:'contratado'},
 ];
 
 let vagasLocal=[...VAGAS_DB];
@@ -326,7 +326,7 @@ function resendCode(){
 }
 
 function showForgot(){
-  showToast('📧 Contate: cibericlab@gmail.com para redefinir sua senha.','info');
+  showToast('📧 Contate: cibericlab'+'@'+'gmail.com para redefinir sua senha.','info');
 }
 
 function moveCode(el,n){
@@ -779,7 +779,7 @@ function previewRecLogo(input){if(input.files[0]){const reader=new FileReader();
 function salvarPerfilRec(){const nome=document.getElementById('rec-nome').value.trim();if(!nome){showToast('Preencha o nome!','error');return;}document.getElementById('perfilRecNome').textContent=nome;document.getElementById('perfilRecCargo').textContent=document.getElementById('rec-setor').value||'Recrutador';document.getElementById('prs-vagas').textContent=vagasLocal.filter(v=>v.status!=='encerrado').length;document.getElementById('prs-cand').textContent=CANDS_MOCK.length;document.getElementById('prs-dias').textContent=Math.floor(Math.random()*200+30);showToast('✅ Perfil salvo!','success');}
 
 // ===== USERS =====
-const USERS_MOCK=[{nome:'Admin Geral',email:'admin@vagaspro.com.br',whatsapp:'(62) 99999-0001',nivel:'superadmin',status:'ativo',cadastro:'01/01/2025'},{nome:'Gestor RH',email:'gestor@vagaspro.com.br',whatsapp:'(62) 98888-1234',nivel:'admin',status:'ativo',cadastro:'15/02/2025'},{nome:'Recrutador Teste',email:'rec@empresa.com.br',whatsapp:'(62) 97777-5678',nivel:'recrutador',status:'ativo',cadastro:'20/03/2025'},{nome:'Supervisor',email:'supervisor@vagaspro.com.br',whatsapp:'(62) 96666-9012',nivel:'supervisor',status:'ativo',cadastro:'01/04/2025'},{nome:'João Candidato',email:'joao@email.com',whatsapp:'(62) 95555-1111',nivel:'candidato',status:'ativo',cadastro:'10/04/2025'},];
+const USERS_MOCK=[{nome:'Admin Geral',email:'admin'+'@'+'vagaspro.com.br',whatsapp:'(62) 99999-0001',nivel:'superadmin',status:'ativo',cadastro:'01/01/2025'},{nome:'Gestor RH',email:'gestor'+'@'+'vagaspro.com.br',whatsapp:'(62) 98888-1234',nivel:'admin',status:'ativo',cadastro:'15/02/2025'},{nome:'Recrutador Teste',email:'rec'+'@'+'empresa.com.br',whatsapp:'(62) 97777-5678',nivel:'recrutador',status:'ativo',cadastro:'20/03/2025'},{nome:'Supervisor',email:'supervisor'+'@'+'vagaspro.com.br',whatsapp:'(62) 96666-9012',nivel:'supervisor',status:'ativo',cadastro:'01/04/2025'},{nome:'João Candidato',email:'joao'+'@'+'email.com',whatsapp:'(62) 95555-1111',nivel:'candidato',status:'ativo',cadastro:'10/04/2025'},];
 function renderUsuarios(){const rl={superadmin:'SuperAdmin',admin:'Admin',supervisor:'Supervisor',recrutador:'Recrutador',candidato:'Candidato'};const rc={superadmin:'badge-blue',admin:'badge-amber',supervisor:'badge-gray',recrutador:'badge-green',candidato:'badge-gray'};document.getElementById('usuariosTableBody').innerHTML=USERS_MOCK.map(u=>`<tr><td><strong>${u.nome}</strong></td><td>${u.email}</td><td>${u.whatsapp}</td><td><span class="badge ${rc[u.nivel]}">${rl[u.nivel]}</span></td><td><span class="badge badge-green">${u.status}</span></td><td>${u.cadastro}</td><td><button class="btn btn-ghost btn-xs" onclick="showToast('Editar usuário em breve!','')">Editar</button></td></tr>`).join('');}
 
 // ===== NEWS =====
@@ -809,7 +809,7 @@ function exportarCSVCandidatos(vagaId){let cands=vagaId?CANDS_MOCK.filter(c=>c.v
 function exportarPDF(){window.print();showToast('🖨️ Use Ctrl+P para salvar como PDF','info');}
 
 // ===== SQL =====
-const SQL_TXT=`-- VagasPro v4 · Ciberic.Lab · cibericlab@gmail.com
+const SQL_TXT=`-- VagasPro v4 · Ciberic.Lab · cibericlab'+'@'+'gmail.com
 -- Script de Banco de Dados Completo
 -- Execute no SQL Editor do painel de banco de dados
 -- Compatível com PostgreSQL / Supabase
@@ -1145,8 +1145,8 @@ CREATE OR REPLACE VIEW candidatos_sem_dados_pessoais AS
 -- ══════════════════════════════════
 INSERT INTO usuarios(nome,email,nivel,email_verificado,aceite_termos)
 VALUES
-  ('Admin Geral','admin@vagaspro.com.br','superadmin',TRUE,TRUE),
-  ('Gestor RH','gestor@vagaspro.com.br','admin',TRUE,TRUE)
+  ('Admin Geral','admin'+'@'+'vagaspro.com.br','superadmin',TRUE,TRUE),
+  ('Gestor RH','gestor'+'@'+'vagaspro.com.br','admin',TRUE,TRUE)
 ON CONFLICT(email) DO NOTHING;
 
 -- FIM DO SCRIPT VagasPro v4 · Ciberic.Lab`;
@@ -1259,11 +1259,11 @@ function renderTermosModal(){
   el.innerHTML=`<div style="font-size:13px;color:var(--g700);line-height:1.8;padding-top:4px;">
 
 <div style="background:var(--accent-soft);border-left:4px solid var(--accent);padding:10px 14px;border-radius:0 8px 8px 0;margin-bottom:16px;font-size:12px;color:#3730a3;">
-🔒 Este documento regula o uso do <strong>VagasPro</strong>, desenvolvido pela <strong>Ciberic.Lab</strong> (cibericlab@gmail.com), em conformidade com a <strong>LGPD – Lei nº 13.709/2018</strong> e demais normas brasileiras.
+🔒 Este documento regula o uso do <strong>VagasPro</strong>, desenvolvido pela <strong>Ciberic.Lab</strong> (cibericlab'+'@'+'gmail.com), em conformidade com a <strong>LGPD – Lei nº 13.709/2018</strong> e demais normas brasileiras.
 </div>
 
 <h3 style="font-size:13.5px;font-weight:700;color:var(--accent);margin:14px 0 6px;border-bottom:1px solid var(--g100);padding-bottom:5px;">1. Identificação da Empresa</h3>
-<p><strong>Empresa:</strong> Ciberic.Lab &nbsp;|&nbsp; <strong>E-mail:</strong> cibericlab@gmail.com<br>
+<p><strong>Empresa:</strong> Ciberic.Lab &nbsp;|&nbsp; <strong>E-mail:</strong> cibericlab'+'@'+'gmail.com<br>
 <strong>Produto:</strong> VagasPro – Sistema Inteligente de Gestão de Vagas</p>
 
 <h3 style="font-size:13.5px;font-weight:700;color:var(--accent);margin:14px 0 6px;border-bottom:1px solid var(--g100);padding-bottom:5px;">2. Cadastro e Acesso</h3>
@@ -1281,7 +1281,7 @@ function renderTermosModal(){
 <h3 style="font-size:13.5px;font-weight:700;color:var(--accent);margin:14px 0 6px;border-bottom:1px solid var(--g100);padding-bottom:5px;">4. Proteção de Dados – LGPD (Lei 13.709/2018)</h3>
 <p><strong>Dados coletados:</strong> nome, e-mail, WhatsApp, dados profissionais (voluntários), logs de uso.</p>
 <p><strong>Finalidade:</strong> intermediação de candidaturas, alertas de vagas, melhoria da plataforma.</p>
-<p><strong>Seus direitos:</strong> acessar, corrigir, portabilidade, exclusão e revogação do consentimento a qualquer momento. Contato: <strong>cibericlab@gmail.com</strong></p>
+<p><strong>Seus direitos:</strong> acessar, corrigir, portabilidade, exclusão e revogação do consentimento a qualquer momento. Contato: <strong>cibericlab'+'@'+'gmail.com</strong></p>
 <div style="background:#fffbeb;border:1.5px solid #fcd34d;border-radius:12px;padding:10px 13px;margin:10px 0;font-size:12px;color:#92400e;">
 ⚠️ O currículo gerado na aba "Fazer Currículo" e o PDF exportado <strong>não são armazenados no sistema</strong>. Apenas o mini-currículo de perfil fica salvo.
 </div>
@@ -1305,7 +1305,7 @@ function renderTermosModal(){
   </div>
 </div>
 <div style="background:#fffbeb;border:1.5px solid #fcd34d;border-radius:12px;padding:10px 13px;font-size:12px;color:#92400e;">
-⚠️ <strong>Os preços podem ser alterados a qualquer momento</strong> sem aviso prévio. Contato: cibericlab@gmail.com
+⚠️ <strong>Os preços podem ser alterados a qualquer momento</strong> sem aviso prévio. Contato: cibericlab'+'@'+'gmail.com
 </div>
 
 <h3 style="font-size:13.5px;font-weight:700;color:var(--accent);margin:14px 0 6px;border-bottom:1px solid var(--g100);padding-bottom:5px;">6. Uso Aceitável</h3>
@@ -1381,10 +1381,10 @@ function renderTermos(){
   el.innerHTML=`
     <h1>📄 Termos de Uso, Privacidade e LGPD</h1>
     <p style="color:var(--g400);font-size:12px;margin-bottom:16px;">Versão 1.0 · Vigência: Janeiro/2025 · Ciberic.Lab</p>
-    <div class="highlight-termos">🔒 Este documento regula o uso do <strong>VagasPro</strong>, desenvolvido pela <strong>Ciberic.Lab</strong> (cibericlab@gmail.com), em conformidade com a <strong>LGPD – Lei nº 13.709/2018</strong>, o Marco Civil da Internet (Lei 12.965/2014) e demais normas do ordenamento jurídico brasileiro.</div>
+    <div class="highlight-termos">🔒 Este documento regula o uso do <strong>VagasPro</strong>, desenvolvido pela <strong>Ciberic.Lab</strong> (cibericlab'+'@'+'gmail.com), em conformidade com a <strong>LGPD – Lei nº 13.709/2018</strong>, o Marco Civil da Internet (Lei 12.965/2014) e demais normas do ordenamento jurídico brasileiro.</div>
 
     <h2>1. Identificação da Empresa</h2>
-    <p><strong>Empresa:</strong> Ciberic.Lab &nbsp;|&nbsp; <strong>E-mail:</strong> cibericlab@gmail.com<br>
+    <p><strong>Empresa:</strong> Ciberic.Lab &nbsp;|&nbsp; <strong>E-mail:</strong> cibericlab'+'@'+'gmail.com<br>
     <strong>Produto:</strong> VagasPro – Sistema Inteligente de Gestão de Vagas<br>
     A Ciberic.Lab é criadora, proprietária e responsável pelo VagasPro, atuando como <strong>controladora de dados pessoais</strong> (Art. 5º, VI da LGPD).</p>
 
@@ -1431,7 +1431,7 @@ function renderTermos(){
       <li>Revogar consentimento a qualquer momento;</li>
       <li>Peticionar à ANPD (Autoridade Nacional de Proteção de Dados).</li>
     </ul>
-    <p><strong>Canal de atendimento (DPO):</strong> cibericlab@gmail.com</p>
+    <p><strong>Canal de atendimento (DPO):</strong> cibericlab'+'@'+'gmail.com</p>
     <h3>5.5 Currículo em PDF e Dados Temporários</h3>
     <div class="highlight-termos" style="background:var(--amber-soft);border-color:var(--amber);color:#92400e;">
       ⚠️ O currículo completo gerado na aba "Fazer Currículo" e o PDF exportado <strong>não são armazenados no sistema</strong>. Os dados digitados existem apenas durante a sessão ativa. Apenas o <strong>mini-currículo de perfil</strong> (resumo cadastrado separadamente) é salvo na plataforma.
@@ -1481,7 +1481,7 @@ function renderTermos(){
       </div>
     </div>
     <div class="highlight-termos" style="background:var(--amber-soft);border-color:var(--amber);color:#92400e;">
-      ⚠️ <strong>Os preços, planos e condições de assinatura podem ser alterados a qualquer momento</strong> pela Ciberic.Lab, com ou sem aviso prévio. As condições vigentes no momento da contratação serão mantidas até o fim do período contratado. Para valores atualizados: <strong>cibericlab@gmail.com</strong>
+      ⚠️ <strong>Os preços, planos e condições de assinatura podem ser alterados a qualquer momento</strong> pela Ciberic.Lab, com ou sem aviso prévio. As condições vigentes no momento da contratação serão mantidas até o fim do período contratado. Para valores atualizados: <strong>cibericlab'+'@'+'gmail.com</strong>
     </div>
 
     <h2>7. Uso Aceitável e Proibições</h2>
@@ -1505,7 +1505,7 @@ function renderTermos(){
     <p>A plataforma utiliza armazenamento local (localStorage) para: manter sessões autenticadas; lembrar preferências do usuário. Não há uso de cookies de rastreamento de terceiros para fins publicitários.</p>
 
     <h2>11. Rescisão</h2>
-    <p>O usuário pode encerrar sua conta a qualquer momento via e-mail: cibericlab@gmail.com. Após encerramento, os dados serão eliminados conforme a política de retenção, salvo obrigações legais de guarda.</p>
+    <p>O usuário pode encerrar sua conta a qualquer momento via e-mail: cibericlab'+'@'+'gmail.com. Após encerramento, os dados serão eliminados conforme a política de retenção, salvo obrigações legais de guarda.</p>
 
     <h2>12. Foro e Legislação Aplicável</h2>
     <p>Estes Termos são regidos pelas leis da República Federativa do Brasil. As partes elegem o foro da Comarca de <strong>Goiânia – Goiás</strong> para dirimir controvérsias, com renúncia a qualquer outro, por mais privilegiado que seja.</p>
@@ -1513,7 +1513,7 @@ function renderTermos(){
 
     <h2>13. Contato e DPO</h2>
     <ul>
-      <li>📧 <strong>cibericlab@gmail.com</strong></li>
+      <li>📧 <strong>cibericlab'+'@'+'gmail.com</strong></li>
       <li>🏢 Ciberic.Lab · Goiânia – GO · Brasil</li>
     </ul>
     <div class="highlight-termos" style="margin-top:20px;">
