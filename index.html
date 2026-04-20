@@ -1448,7 +1448,26 @@ tbody tr:hover{background:var(--g50);}
     </div>
 
     <!-- USUÁRIOS -->
-    <div class="page" id="page-usuarios"><div class="section-header" style="margin-bottom:16px;"><div class="section-title">Gestão de Usuários</div><button class="btn btn-primary btn-sm" onclick="abrirNovoUsuario()">+ Novo Usuário</button></div><div class="table-wrap"><div class="table-scroll"><table><thead><tr><th>Nome</th><th>E-mail</th><th>WhatsApp</th><th>Nível</th><th>Status</th><th>Cadastro</th><th>Ações</th></tr></thead><tbody id="usuariosTableBody"></tbody></table></div></div></div>
+    <div class="page" id="page-usuarios">
+                <div class="section-header" style="margin-bottom:16px;">
+                  <div class="section-title">Gestão de Usuários</div>
+                  <div style="display:flex;gap:8px;align-items:center;">
+                    <button class="btn btn-amber btn-sm" onclick="renderSolicitacoesRecrutador()">
+                      &#x1F3E2; Solicitações<span id="nbSolicitacoes" style="background:var(--red);color:white;border-radius:999px;padding:1px 7px;font-size:10px;font-weight:800;margin-left:5px;display:none;"></span>
+                    </button>
+                    <button class="btn btn-primary btn-sm" onclick="abrirNovoUsuario()">+ Novo Usuário</button>
+                  </div>
+                </div>
+                <div id="painelSolicitacoes" style="display:none;margin-bottom:16px;">
+                  <div style="background:linear-gradient(135deg,#fffbeb,#fef9e7);border:1.5px solid #fcd34d;border-radius:var(--r-md);padding:20px;">
+                    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;flex-wrap:wrap;gap:8px;">
+                      <div style="font-size:15px;font-weight:800;color:#92400e;">&#x1F3E2; Solicitações de Acesso — Recrutador</div>
+                      <button class="btn btn-ghost btn-sm" onclick="document.getElementById('painelSolicitacoes').style.display='none'">&#x2715; Fechar</button>
+                    </div>
+                    <div id="listaSolicitacoes"><div style="text-align:center;padding:20px;color:var(--g400);">Clique em "Solicitações" para carregar.</div></div>
+                  </div>
+                </div>
+                <div class="table-wrap"><div class="table-scroll"><table><thead><tr><th>Nome</th><th>E-mail</th><th>WhatsApp</th><th>Nível</th><th>Status</th><th>Cadastro</th><th>Ações</th></tr></thead><tbody id="usuariosTableBody"></tbody></table></div></div></div>
 
     <!-- LINKS IMPORTANTES — RH Positivo / Rafael Mendes -->
     <div class="page" id="page-noticias">
@@ -2203,16 +2222,48 @@ async function _concluirCadastroGoogle(nivel){
   showToast('⏳ Criando sua conta...','info');
 
   try{
-    // Gerar senha aleatória (usuário Google não vai usar senha)
+    // Recrutador → cadastrar como "pendente" aguardando aprovação admin
+    var nivelReal = nivel === 'recrutador' ? 'candidato' : nivel; // começa como candidato
     var senhaTmp = 'G_' + Math.random().toString(36).slice(2,10) + '_' + Date.now();
     var res = await _sb.rpc('fn_auth_register',{
       p_nome:   nome,
       p_email:  email,
       p_senha:  senhaTmp,
-      p_nivel:  nivel
+      p_nivel:  nivelReal
     });
     if(!res.data || !res.data.ok){
       showToast((res.data&&res.data.erro)||'Erro ao criar conta.','error');
+      return;
+    }
+    var uid = res.data.id;
+
+    if(nivel === 'recrutador' && uid){
+      // Salvar solicitação de recrutador na tabela solicitacoes_recrutador
+      try{
+        await _sb.from('solicitacoes_recrutador').insert({
+          usuario_id: uid,
+          nome: nome,
+          email: email,
+          avatar_url: avatar||null,
+          status: 'pendente',
+          origem: 'google',
+          created_at: new Date().toISOString()
+        });
+      }catch(e){ console.warn('[solicitacao_rec]',e); }
+      // Notificar admins via tabela notificacoes
+      try{
+        await _sb.from('notificacoes_admin').insert({
+          tipo: 'solicitacao_recrutador',
+          titulo: '🏢 Novo recrutador aguarda aprovação',
+          mensagem: nome + ' (' + email + ') solicitou acesso como recrutador via Google.',
+          dados: JSON.stringify({usuario_id:uid, nome:nome, email:email}),
+          lida: false,
+          created_at: new Date().toISOString()
+        });
+      }catch(e){ console.warn('[notif_admin]',e); }
+      // Mostrar tela de aguardando aprovação
+      modal.style.display = 'none';
+      _mostrarTelaAguardandoAprovacao(nome, email);
       return;
     }
     // Marcar e-mail como verificado (Google já verificou) e salvar avatar
@@ -2358,7 +2409,7 @@ async function doRegister(){
     reBtn();
     if(res.error||!res.data){showToast((res.error&&res.error.message)||'Erro ao criar conta.','error');return;}
     if(!res.data.ok){showToast(res.data.erro||'Não foi possível criar a conta.','error');return;}
-    _pendingRegister={nome:nome,email:email,nivel:nivel,id:res.data.id};
+    if(nivel==='recrutador'){var uid2=res.data.id;try{await _sb.from('solicitacoes_recrutador').insert({usuario_id:uid2,nome:nome,email:email,avatar_url:null,status:'pendente',origem:'email',created_at:new Date().toISOString()});await _sb.from('notificacoes_admin').insert({tipo:'solicitacao_recrutador',titulo:'Novo recrutador aguarda aprovacao',mensagem:nome+' ('+email+') solicitou acesso como recrutador.',dados:JSON.stringify({usuario_id:uid2,nome:nome,email:email}),lida:false,created_at:new Date().toISOString()});}catch(e){}reBtn();_mostrarTelaAguardandoAprovacao(nome,email);return;}_pendingRegister={nome:nome,email:email,nivel:nivel,id:res.data.id};
     _mostrarVerificacao(res.data.id,email);
   }catch(e){
     reBtn();
@@ -2658,6 +2709,163 @@ function renderDashboard(){
   document.getElementById('recentesDash').innerHTML = recHTML;
   setTimeout(renderTopRecrutador,80);
 }
+
+
+// ── Tela de aguardando aprovação (recrutador) ──────────────────────
+function _mostrarTelaAguardandoAprovacao(nome, email){
+  var lo = document.getElementById('loginOverlay');
+  if(lo) lo.style.display = 'none';
+
+  var existing = document.getElementById('aprovacaoOverlay');
+  if(existing) existing.remove();
+
+  var div = document.createElement('div');
+  div.id = 'aprovacaoOverlay';
+  div.style.cssText = 'position:fixed;inset:0;background:linear-gradient(155deg,#1a1f3a,#1e1b4b,#312e81);z-index:4000;display:flex;align-items:center;justify-content:center;padding:20px;';
+  div.innerHTML = `
+    <div style="background:white;border-radius:24px;padding:40px 36px;max-width:480px;width:100%;text-align:center;box-shadow:0 24px 64px rgba(0,0,0,.3);">
+      <div style="width:80px;height:80px;background:linear-gradient(135deg,#f59e0b,#d97706);border-radius:24px;display:flex;align-items:center;justify-content:center;font-size:36px;margin:0 auto 20px;">⏳</div>
+      <div style="font-size:22px;font-weight:900;color:var(--g900);margin-bottom:8px;letter-spacing:-.5px;">Solicitação enviada!</div>
+      <div style="font-size:14px;color:var(--g500);margin-bottom:6px;font-weight:600;">Olá, <strong style="color:var(--g800);">${nome}</strong>!</div>
+      <div style="font-size:13px;color:var(--g500);margin-bottom:24px;line-height:1.7;">
+        Sua solicitação de acesso como <strong>Recrutador</strong> foi recebida e está em análise.<br>
+        Você receberá uma notificação em <strong style="color:var(--accent);">${email}</strong> assim que for aprovado(a).
+      </div>
+
+      <!-- Status visual -->
+      <div style="background:var(--amber-soft);border:1.5px solid #fcd34d;border-radius:var(--r-md);padding:16px;margin-bottom:24px;text-align:left;">
+        <div style="font-size:12px;font-weight:800;color:#92400e;margin-bottom:10px;text-transform:uppercase;letter-spacing:.6px;">Status da solicitação</div>
+        <div style="display:flex;flex-direction:column;gap:10px;">
+          <div style="display:flex;align-items:center;gap:10px;">
+            <div style="width:28px;height:28px;border-radius:50%;background:#22c55e;display:flex;align-items:center;justify-content:center;color:white;font-size:13px;flex-shrink:0;">✓</div>
+            <div>
+              <div style="font-size:12.5px;font-weight:700;color:var(--g800);">Cadastro realizado</div>
+              <div style="font-size:11px;color:var(--g500);">Conta criada com sucesso</div>
+            </div>
+          </div>
+          <div style="display:flex;align-items:center;gap:10px;">
+            <div style="width:28px;height:28px;border-radius:50%;background:#f59e0b;display:flex;align-items:center;justify-content:center;color:white;font-size:13px;flex-shrink:0;animation:spin .7s linear infinite;">⏳</div>
+            <div>
+              <div style="font-size:12.5px;font-weight:700;color:var(--g800);">Aguardando aprovação</div>
+              <div style="font-size:11px;color:var(--g500);">Admin analisando sua solicitação</div>
+            </div>
+          </div>
+          <div style="display:flex;align-items:center;gap:10px;opacity:.4;">
+            <div style="width:28px;height:28px;border-radius:50%;background:var(--g300);display:flex;align-items:center;justify-content:center;color:white;font-size:13px;flex-shrink:0;">🏢</div>
+            <div>
+              <div style="font-size:12.5px;font-weight:700;color:var(--g800);">Acesso liberado</div>
+              <div style="font-size:11px;color:var(--g500);">Você receberá e-mail de confirmação</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div style="font-size:12px;color:var(--g400);margin-bottom:20px;line-height:1.6;">
+        ⏱️ O prazo médio de análise é de <strong>até 24 horas</strong>.<br>
+        Em caso de dúvidas: <a href="mailto:cibericlab\u0040gmail.com" style="color:var(--accent);">cibericlab\u0040gmail.com</a>
+      </div>
+
+      <button onclick="document.getElementById('aprovacaoOverlay').remove();document.getElementById('loginOverlay').style.display='flex';"
+        style="width:100%;height:46px;background:linear-gradient(135deg,var(--accent),var(--accent2));color:white;border:none;border-radius:var(--r-pill);font-size:14px;font-weight:800;font-family:inherit;cursor:pointer;box-shadow:0 4px 18px rgba(91,106,240,.35);">
+        Entendido → Ir para o login
+      </button>
+    </div>
+  `;
+  document.body.appendChild(div);
+}
+
+// ── Aprovar/Reprovar recrutador (chamado pelo admin no painel) ──
+async function aprovarRecrutador(usuarioId, nome, email, aprovar){
+  if(!_sb){ showToast('Sem conexão.','error'); return; }
+  var novoNivel  = aprovar ? 'recrutador' : 'candidato';
+  var novoStatus = aprovar ? 'ativo'      : 'ativo';
+  try{
+    // Atualizar nível do usuário
+    await _sb.rpc('fn_atualizar_usuario',{
+      p_id: usuarioId,
+      p_nivel: novoNivel,
+      p_status: novoStatus
+    });
+    // Atualizar status da solicitação
+    await _sb.from('solicitacoes_recrutador')
+      .update({ status: aprovar ? 'aprovado' : 'reprovado', respondido_em: new Date().toISOString() })
+      .eq('usuario_id', usuarioId);
+    // Registrar notificação para o próprio usuário
+    await _sb.from('notificacoes_usuario').insert({
+      usuario_id: usuarioId,
+      tipo: aprovar ? 'aprovado_recrutador' : 'reprovado_recrutador',
+      titulo: aprovar ? '✅ Acesso de Recrutador aprovado!' : '❌ Solicitação não aprovada',
+      mensagem: aprovar
+        ? 'Parabéns, '+nome+'! Seu acesso como Recrutador foi aprovado. Faça login para começar a publicar vagas.'
+        : 'Olá, '+nome+'. Sua solicitação de acesso como Recrutador não foi aprovada desta vez. Entre em contato: cibericlab\u0040gmail.com',
+      lida: false,
+      created_at: new Date().toISOString()
+    });
+    showToast(aprovar ? '✅ Recrutador '+nome+' aprovado!' : '❌ Solicitação de '+nome+' reprovada.', aprovar ? 'success' : 'warning');
+    // Recarregar painel de solicitações se estiver aberto
+    if(typeof renderSolicitacoesRecrutador === 'function') renderSolicitacoesRecrutador();
+  }catch(e){
+    showToast('Erro ao processar: '+e.message,'error');
+    console.warn('[aprovarRecrutador]',e);
+  }
+}
+// ────────────────────────────────────────────────────────────────
+
+
+// ── Painel de solicitações de recrutador (admin) ─────────────────
+async function renderSolicitacoesRecrutador(){
+  var painel = document.getElementById('painelSolicitacoes');
+  if(painel) painel.style.display = 'block';
+  var lista = document.getElementById('listaSolicitacoes');
+  if(!lista) return;
+  lista.innerHTML = '<div style="text-align:center;padding:24px;color:var(--g400);">Carregando...</div>';
+  if(!_sb){ lista.innerHTML = '<div style="color:var(--red);padding:12px;">Sem conexão com banco.</div>'; return; }
+  try{
+    var res = await _sb.from('solicitacoes_recrutador')
+      .select('*').eq('status','pendente').order('created_at',{ascending:false});
+    var solics = (res.data||[]);
+    // Atualizar badge
+    var nb = document.getElementById('nbSolicitacoes');
+    if(nb) nb.textContent = solics.length > 0 ? solics.length : '';
+    if(!solics.length){
+      lista.innerHTML = '<div style="text-align:center;padding:20px;color:var(--g500);font-weight:600;">✅ Nenhuma solicitação pendente.</div>';
+      return;
+    }
+    lista.innerHTML = solics.map(function(s){
+      var dt = s.created_at ? new Date(s.created_at).toLocaleDateString('pt-BR',{day:'2-digit',month:'2-digit',year:'numeric',hour:'2-digit',minute:'2-digit'}) : '';
+      var origem = s.origem === 'google' ? '🟢 Google' : '📧 E-mail';
+      return '<div style="background:white;border:1.5px solid var(--g200);border-radius:var(--r-md);padding:16px 18px;margin-bottom:10px;display:flex;align-items:center;gap:14px;flex-wrap:wrap;">'
+        + '<div style="width:44px;height:44px;border-radius:50%;background:linear-gradient(135deg,var(--accent),#a78bfa);display:flex;align-items:center;justify-content:center;color:white;font-size:15px;font-weight:800;flex-shrink:0;">'+(s.nome||'?').slice(0,2).toUpperCase()+'</div>'
+        + '<div style="flex:1;min-width:160px;">'
+          + '<div style="font-size:14px;font-weight:800;color:var(--g900);">'+(s.nome||'–')+'</div>'
+          + '<div style="font-size:12px;color:var(--accent);font-weight:600;">'+(s.email||'–')+'</div>'
+          + '<div style="font-size:11px;color:var(--g400);margin-top:3px;">'+origem+' · '+dt+'</div>'
+        + '</div>'
+        + '<div style="display:flex;gap:8px;flex-wrap:wrap;">'
+          + '<button class="btn btn-green btn-sm" onclick="aprovarRecrutador(this.dataset.id,this.dataset.nome,this.dataset.email,true)" data-id="'+s.usuario_id+'" data-nome="'+s.nome+'" data-email="'+s.email+'">&#x2705; Aprovar</button>'
+          + '<button class="btn btn-red btn-sm" onclick="aprovarRecrutador(this.dataset.id,this.dataset.nome,this.dataset.email,false)" data-id="'+s.usuario_id+'" data-nome="'+s.nome+'" data-email="'+s.email+'">&#x274C; Reprovar</button>'
+        + '</div>'
+      + '</div>';
+    }).join('');
+  }catch(e){
+    lista.innerHTML = '<div style="color:var(--red);padding:12px;">Erro ao carregar solicitações: '+e.message+'</div>';
+  }
+}
+
+// Verificar badge de solicitações ao carregar usuários
+async function _verificarBadgeSolicitacoes(){
+  if(!_sb) return;
+  var nivel = currentUser ? currentUser.nivel : '';
+  if(!['superadmin','admin'].includes(nivel)) return;
+  try{
+    var res = await _sb.from('solicitacoes_recrutador').select('id',{count:'exact'}).eq('status','pendente');
+    var nb = document.getElementById('nbSolicitacoes');
+    var count = res.count || 0;
+    if(nb){ nb.textContent = count > 0 ? count : ''; nb.style.display = count > 0 ? 'inline' : 'none'; }
+    if(count > 0) showToast('🏢 '+count+' solicitação(ões) de recrutador aguardando aprovação.','warning');
+  }catch(e){}
+}
+// ────────────────────────────────────────────────────────────────
 
 
 // ===== VAGAS RENDER =====
