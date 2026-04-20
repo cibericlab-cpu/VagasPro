@@ -11,6 +11,67 @@ window.onerror = function(msg, src, line, col, err) {
   console.error('[VagasPro]', msg, 'L'+line, src);
   return false;
 };
+// ══════════════════════════════════════════════════════
+// RESEND — Envio de E-mails Transacionais
+// Configure sua API Key em Configurações → IA e Integrações
+// ══════════════════════════════════════════════════════
+var RESEND_API_KEY = localStorage.getItem('vp_resend_key') || '';
+var RESEND_FROM    = localStorage.getItem('vp_resend_from') || 'VagasPro <noreply\u0040seudominio.com>';
+var ADMIN_EMAIL    = localStorage.getItem('vp_admin_email') || '';
+
+async function _enviarEmailResend(para, assunto, htmlBody){
+  // Envia via Supabase Edge Function — a API Key do Resend fica segura no servidor
+  // NÃO envia a key pelo front-end
+  console.info('[Email] Enviando via Edge Function para:', para);
+  try{
+    var resp = await fetch('https://wsvqzagbulfufyqowwfx.supabase.co/functions/v1/send-email', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'apikey': '{}'.replace('{}', window.__SUPA_ANON__ || '')
+      },
+      body: JSON.stringify({ _direct: true, para: para, assunto: assunto, html: htmlBody })
+    });
+    var data = await resp.json();
+    if(resp.ok){ return { ok: true, id: data.id }; }
+    else{ console.warn('[Email] Erro:', data); return { ok: false, erro: data }; }
+  }catch(e){
+    console.warn('[Email] Falha:', e);
+    return { ok: false, erro: e.message };
+  }
+}
+
+// Função central de email — chama Cloudflare Worker (key segura no servidor)
+async function _notificarEmail(tipo, dados){
+  // Worker URL — configure após fazer deploy no Cloudflare
+  var workerUrl = localStorage.getItem('vp_worker_url') || 'https://send-email.SEU-USUARIO.workers.dev';
+
+  if(!workerUrl || workerUrl.includes('SEU-USUARIO')){
+    console.info('[Email] Worker URL não configurada — configure em Configurações.');
+    return { ok: false, motivo: 'sem_url' };
+  }
+
+  try{
+    var payload = Object.assign({ tipo: tipo }, dados);
+    var resp = await fetch(workerUrl, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload)
+    });
+    var data = await resp.json();
+    if(resp.ok){
+      console.info('[Email] Enviado via Worker:', tipo, '| id:', data.id);
+      return { ok: true };
+    }
+    console.warn('[Email] Worker erro:', data);
+    return { ok: false, erro: data };
+  }catch(e){
+    console.warn('[Email] Falha Worker:', e.message);
+    return { ok: false, erro: e.message };
+  }
+}
+
+
 // ═══════════════════════════════════════════════════════════
 // CONFIGURAÇÃO DO BANCO DE DADOS
 // Substitua pelas suas credenciais do painel:
@@ -318,29 +379,48 @@ async function _concluirCadastroGoogle(nivel){
     var uid = res.data.id;
 
     if(nivel === 'recrutador' && uid){
-      // Salvar solicitação de recrutador na tabela solicitacoes_recrutador
+      // Salvar solicitação via RPC (bypassa RLS)
       try{
-        await _sb.from('solicitacoes_recrutador').insert({
-          usuario_id: uid,
-          nome: nome,
-          email: email,
-          avatar_url: avatar||null,
-          status: 'pendente',
-          origem: 'google',
-          created_at: new Date().toISOString()
+        var solRes = await _sb.rpc('fn_criar_solicitacao_recrutador',{
+          p_usuario_id: uid,
+          p_nome: nome,
+          p_email: email,
+          p_avatar_url: avatar||null,
+          p_origem: 'google'
         });
-      }catch(e){ console.warn('[solicitacao_rec]',e); }
-      // Notificar admins via tabela notificacoes
+        if(solRes.error) throw solRes.error;
+        console.info('[VagasPro] Solicitação recrutador criada:', uid);
+      }catch(e){
+        // Fallback: insert direto
+        try{
+          await _sb.from('solicitacoes_recrutador').insert({
+            usuario_id:uid, nome:nome, email:email,
+            avatar_url:avatar||null, status:'pendente',
+            origem:'google', created_at:new Date().toISOString()
+          });
+        }catch(e2){ console.warn('[solicitacao_rec fallback]',e2); }
+      }
+      // Notificar admins
       try{
-        await _sb.from('notificacoes_admin').insert({
-          tipo: 'solicitacao_recrutador',
-          titulo: '🏢 Novo recrutador aguarda aprovação',
-          mensagem: nome + ' (' + email + ') solicitou acesso como recrutador via Google.',
-          dados: JSON.stringify({usuario_id:uid, nome:nome, email:email}),
-          lida: false,
-          created_at: new Date().toISOString()
+        await _sb.rpc('fn_notificar_admin',{
+          p_tipo: 'solicitacao_recrutador',
+          p_titulo: 'Novo recrutador aguarda aprovacao',
+          p_mensagem: nome+' solicitou acesso como recrutador via Google.',
+          p_dados: JSON.stringify({usuario_id:uid,nome:nome,email:email})
         });
-      }catch(e){ console.warn('[notif_admin]',e); }
+      }catch(e){
+        try{
+          await _sb.from('notificacoes_admin').insert({
+            tipo:'solicitacao_recrutador',
+            titulo:'Novo recrutador aguarda aprovacao',
+            mensagem:nome+' ('+email+') solicitou acesso como recrutador via Google.',
+            dados:JSON.stringify({usuario_id:uid,nome:nome,email:email}),
+            lida:false, created_at:new Date().toISOString()
+          });
+        }catch(e2){}
+      }
+      // Notificar admin por email (Edge Function — key segura no servidor)
+      _notificarEmail('nova_solicitacao_admin', { nome: nome, email: email });
       // Mostrar tela de aguardando aprovação
       modal.style.display = 'none';
       _mostrarTelaAguardandoAprovacao(nome, email);
@@ -882,6 +962,16 @@ async function aprovarRecrutador(usuarioId, nome, email, aprovar){
       created_at: new Date().toISOString()
     });
     showToast(aprovar ? '✅ Recrutador '+nome+' aprovado!' : '❌ Solicitação de '+nome+' reprovada.', aprovar ? 'success' : 'warning');
+    // Enviar email de resultado ao candidato
+    if(email){
+      _enviarEmailResend(
+        email,
+        aprovar ? '✅ Acesso de Recrutador aprovado — VagasPro' : 'Atualização sobre sua solicitação — VagasPro',
+        _emailAprovacaoRecrutador(nome, aprovar)
+      ).then(function(r){
+        if(r.ok) showToast('📧 E-mail enviado para '+email,'info');
+      });
+    }
     // Recarregar painel de solicitações se estiver aberto
     if(typeof renderSolicitacoesRecrutador === 'function') renderSolicitacoesRecrutador();
   }catch(e){
@@ -890,6 +980,34 @@ async function aprovarRecrutador(usuarioId, nome, email, aprovar){
   }
 }
 // ────────────────────────────────────────────────────────────────
+
+
+// ── Configurações Resend (chamado pelo painel de config) ──────────
+function salvarConfigResend(){
+  var url = (document.getElementById('workerUrl')||{}).value||'';
+  if(!url || url.includes('SEU-USUARIO')){
+    showToast('Informe a URL do seu Cloudflare Worker.','error');
+    return;
+  }
+  // Só a URL pública do worker é salva — a key do Resend fica no Cloudflare
+  localStorage.setItem('vp_worker_url', url.trim());
+  showToast('✅ URL do Worker salva!','success');
+  var st = document.getElementById('resendStatus');
+  if(st) st.textContent = '✅ Worker configurado';
+}
+
+async function testarEmailResend(){
+  var url = localStorage.getItem('vp_worker_url')||'';
+  if(!url || url.includes('SEU-USUARIO')){
+    showToast('⚙️ Configure a URL do Worker em Configurações antes de testar.','warning');
+    return;
+  }
+  showToast('📧 Enviando e-mail de teste...','info');
+  var r = await _notificarEmail('teste', {});
+  if(r.ok) showToast('✅ E-mail de teste enviado! Verifique a caixa de entrada.','success');
+  else showToast('❌ Falha: verifique se o Worker está deployado e as Secrets configuradas no Cloudflare.','error');
+}
+// ─────────────────────────────────────────────────────────────────
 
 
 // ── Painel de solicitações de recrutador (admin) ─────────────────
@@ -901,9 +1019,17 @@ async function renderSolicitacoesRecrutador(){
   lista.innerHTML = '<div style="text-align:center;padding:24px;color:var(--g400);">Carregando...</div>';
   if(!_sb){ lista.innerHTML = '<div style="color:var(--red);padding:12px;">Sem conexão com banco.</div>'; return; }
   try{
-    var res = await _sb.from('solicitacoes_recrutador')
-      .select('*').eq('status','pendente').order('created_at',{ascending:false});
-    var solics = (res.data||[]);
+    // Tentar RPC primeiro (bypassa RLS), fallback para .from()
+    var solics = [];
+    try{
+      var rpcRes = await _sb.rpc('fn_listar_solicitacoes_recrutador');
+      if(!rpcRes.error && Array.isArray(rpcRes.data)) solics = rpcRes.data;
+      else throw rpcRes.error || new Error('sem dados');
+    }catch(e){
+      var res = await _sb.from('solicitacoes_recrutador')
+        .select('*').eq('status','pendente').order('created_at',{ascending:false});
+      solics = res.data || [];
+    }
     // Atualizar badge
     var nb = document.getElementById('nbSolicitacoes');
     if(nb) nb.textContent = solics.length > 0 ? solics.length : '';
@@ -2010,6 +2136,18 @@ function isAllowed(key,n){const d={superadmin:true,admin:['dashboard','vagas','c
 function renderConfig(){
   // Load IA settings when config page opens
   setTimeout(_carregarConfigIA, 50);
+  // Carregar valores Resend
+  setTimeout(function(){
+    var wu = document.getElementById('workerUrl');
+    if(wu) wu.value = localStorage.getItem('vp_worker_url')||'';
+    var st = document.getElementById('resendStatus');
+    if(st){
+      var savedUrl = localStorage.getItem('vp_worker_url')||'';
+      st.textContent = (savedUrl && !savedUrl.includes('SEU-USUARIO'))
+        ? '\u2705 Worker configurado'
+        : '\u26A0\uFE0F Worker URL n\u00e3o configurada';
+    }
+  }, 80);
   document.getElementById('configAbasLista').innerHTML=ABAS_LIST.map(a=>`<div class="config-row"><div><div class="config-lbl">${a.ico} ${a.label}</div><div class="config-desc">Controle de visibilidade por nível</div></div><div style="display:flex;gap:8px;flex-wrap:wrap;">${NIVEIS.map(n=>`<label style="display:flex;align-items:center;gap:4px;font-size:11px;cursor:pointer;"><input type="checkbox" ${isAllowed(a.key,n)?'checked':''}> ${NL[n]}</label>`).join('')}</div></div>`).join('');}
 
 // ===== FEEDBACK =====
