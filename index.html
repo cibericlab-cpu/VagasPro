@@ -1729,7 +1729,30 @@ tbody tr:hover{background:var(--g50);}
 
       <div class="config-section"><div class="config-title">🎨 Visibilidade de Abas por Nível</div><div id="configAbasLista"></div></div>
       <div class="config-section"><div class="config-title">🔔 Notificações</div><div class="config-row"><div><div class="config-lbl">Alertas de novas vagas</div><div class="config-desc">Notificar quando uma vaga combinar com seu perfil</div></div><div class="toggle on" onclick="this.classList.toggle('on')"></div></div><div class="config-row"><div><div class="config-lbl">Candidatos nas vagas (Recrutador)</div><div class="config-desc">Notificar ao receber novo candidato</div></div><div class="toggle on" onclick="this.classList.toggle('on')"></div></div><div class="config-row"><div><div class="config-lbl">Lembrete de feedback de emprego</div><div class="config-desc">Solicitar feedback após 30 dias de busca ativa</div></div><div class="toggle on" onclick="this.classList.toggle('on')"></div></div></div>
-      <div class="config-section"><div class="config-title">💾 Dados e Exportação</div><div class="config-row"><div><div class="config-lbl">Exportar vagas em CSV</div><div class="config-desc">Download com todos os campos</div></div><button class="btn btn-ghost btn-sm" onclick="exportarCSV()">⬇ Exportar</button></div><div class="config-row"><div><div class="config-lbl">Backup do Sistema</div><div class="config-desc">Executar backup manual das tabelas</div></div><button class="btn btn-green btn-sm" onclick="showToast('Backup iniciado!','success')">▶ Executar</button></div></div>
+      <div class="config-section">
+  <div class="config-title">📧 E-mail — Resend + Cloudflare Worker</div>
+  <div class="hl hl-green" style="font-size:12px;margin-bottom:14px;">
+    🔒 <strong>Arquitetura segura:</strong> A API Key do Resend fica no Cloudflare como Secret — nunca exposta no front-end. Só a URL pública do Worker é salva aqui.
+  </div>
+  <div class="form-group" style="margin-bottom:14px;">
+    <label class="form-lbl">URL do Cloudflare Worker</label>
+    <input type="url" class="fi" id="workerUrl" placeholder="https://send-email.SEU-USUARIO.workers.dev" oninput="this.value=this.value.trim()">
+    <div class="form-hint">Cole a URL gerada após o deploy do Worker no Cloudflare</div>
+  </div>
+  <div style="background:var(--g50);border:1.5px solid var(--g200);border-radius:var(--r-sm);padding:14px 16px;margin-bottom:14px;">
+    <div style="font-size:12px;font-weight:800;color:var(--g700);margin-bottom:8px;">&#x2699;&#xFE0F; Secrets a configurar: Worker → Settings → Variables</div>
+    <code style="background:#0d1117;color:#a5b4fc;padding:10px 14px;border-radius:8px;display:block;font-size:11px;line-height:2;white-space:pre;">RESEND_API_KEY  = re_suachave_aqui
+RESEND_FROM     = VagasPro &lt;noreply&#64;seudominio.com&gt;
+ADMIN_EMAIL     = admin&#64;seudominio.com
+ALLOWED_ORIGIN  = https://cibericlab-cpu.github.io</code>
+  </div>
+  <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
+    <button class="btn btn-primary btn-sm" onclick="salvarConfigResend()">&#x1F4BE; Salvar URL</button>
+    <button class="btn btn-ghost btn-sm" onclick="testarEmailResend()">&#x1F4E7; Testar envio</button>
+    <span id="resendStatus" style="font-size:11.5px;color:var(--g400);"></span>
+  </div>
+</div>
+<div class="config-section"><div class="config-title">💾 Dados e Exportação</div><div class="config-row"><div><div class="config-lbl">Exportar vagas em CSV</div><div class="config-desc">Download com todos os campos</div></div><button class="btn btn-ghost btn-sm" onclick="exportarCSV()">⬇ Exportar</button></div><div class="config-row"><div><div class="config-lbl">Backup do Sistema</div><div class="config-desc">Executar backup manual das tabelas</div></div><button class="btn btn-green btn-sm" onclick="showToast('Backup iniciado!','success')">▶ Executar</button></div></div>
     </div>
 
     <!-- TERMOS -->
