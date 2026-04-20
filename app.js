@@ -274,6 +274,20 @@ async function _loginComPerfil(email, nomeGoogle, avatar){
       }
       // Atualizar avatar Google
       try{ await _sb.rpc('fn_atualizar_usuario',{p_id:uid, p_avatar_url:avatar||null}); }catch(e){}
+
+      // Verificar se tem solicitação pendente de recrutador
+      if(nivel === 'candidato' && _sb){
+        try{
+          var solCheck = await _sb.from('solicitacoes_recrutador')
+            .select('status').eq('usuario_id', uid).maybeSingle();
+          if(solCheck.data && solCheck.data.status === 'pendente'){
+            // Tem solicitação pendente — mostrar tela de aguardo
+            _mostrarTelaAguardandoAprovacao(_sanitize(nome)||nomeGoogle, email);
+            return;
+          }
+        }catch(e){}
+      }
+
       fazerLogin({
         id: uid,
         nome: _sanitize(nome) || nomeGoogle,
@@ -363,20 +377,40 @@ async function _concluirCadastroGoogle(nivel){
   showToast('⏳ Criando sua conta...','info');
 
   try{
-    // Recrutador → cadastrar como "pendente" aguardando aprovação admin
-    var nivelReal = nivel === 'recrutador' ? 'candidato' : nivel; // começa como candidato
-    var senhaTmp = 'G_' + Math.random().toString(36).slice(2,10) + '_' + Date.now();
-    var res = await _sb.rpc('fn_auth_register',{
-      p_nome:   nome,
-      p_email:  email,
-      p_senha:  senhaTmp,
-      p_nivel:  nivelReal
-    });
-    if(!res.data || !res.data.ok){
-      showToast((res.data&&res.data.erro)||'Erro ao criar conta.','error');
-      return;
+    // Verificar se conta já existe (evita erro "e-mail já cadastrado")
+    var existeUid = null;
+    try{
+      var chkRpc = await _sb.rpc('fn_buscar_usuario_google',{p_email: email});
+      if(!chkRpc.error && chkRpc.data && chkRpc.data.id) existeUid = chkRpc.data.id;
+    }catch(e){}
+    if(!existeUid){
+      try{
+        var chkDirect = await _sb.from('usuarios').select('id').eq('email',email).maybeSingle();
+        if(!chkDirect.error && chkDirect.data) existeUid = chkDirect.data.id;
+      }catch(e){}
     }
-    var uid = res.data.id;
+
+    var uid;
+    if(existeUid){
+      // Conta já existe — não tentar criar, apenas processar solicitação
+      uid = existeUid;
+      console.info('[VagasPro] Conta Google já existe:', uid);
+    } else {
+      // Conta nova — criar
+      var nivelReal = nivel === 'recrutador' ? 'candidato' : nivel;
+      var senhaTmp = 'G_' + Math.random().toString(36).slice(2,10) + '_' + Date.now();
+      var res = await _sb.rpc('fn_auth_register',{
+        p_nome:   nome,
+        p_email:  email,
+        p_senha:  senhaTmp,
+        p_nivel:  nivelReal
+      });
+      if(!res.data || !res.data.ok){
+        showToast((res.data&&res.data.erro)||'Erro ao criar conta.','error');
+        return;
+      }
+      uid = res.data.id;
+    }
 
     if(nivel === 'recrutador' && uid){
       // Salvar solicitação via RPC (bypassa RLS)
@@ -1011,6 +1045,31 @@ async function testarEmailResend(){
 
 
 // ── Painel de solicitações de recrutador (admin) ─────────────────
+// ── Inserir solicitação manualmente para usuário que já existe ────
+async function inserirSolicitacaoManual(usuarioId, nome, email){
+  if(!_sb){ showToast('Sem conexão.','error'); return; }
+  try{
+    // Verificar se já existe
+    var chk = await _sb.from('solicitacoes_recrutador')
+      .select('id,status').eq('usuario_id', usuarioId).maybeSingle();
+    if(chk.data){
+      showToast('Solicitação já existe com status: '+chk.data.status,'warning');
+      return;
+    }
+    await _sb.from('solicitacoes_recrutador').insert({
+      usuario_id: usuarioId,
+      nome: nome, email: email,
+      avatar_url: null, status: 'pendente',
+      origem: 'manual', created_at: new Date().toISOString()
+    });
+    showToast('✅ Solicitação criada para '+nome,'success');
+    renderSolicitacoesRecrutador();
+  }catch(e){
+    showToast('Erro: '+e.message,'error');
+  }
+}
+// ─────────────────────────────────────────────────────────────────
+
 async function renderSolicitacoesRecrutador(){
   var painel = document.getElementById('painelSolicitacoes');
   if(painel) painel.style.display = 'block';
@@ -1026,10 +1085,14 @@ async function renderSolicitacoesRecrutador(){
       if(!rpcRes.error && Array.isArray(rpcRes.data)) solics = rpcRes.data;
       else throw rpcRes.error || new Error('sem dados');
     }catch(e){
-      var res = await _sb.from('solicitacoes_recrutador')
-        .select('*').eq('status','pendente').order('created_at',{ascending:false});
-      solics = res.data || [];
+      try{
+        var res = await _sb.from('solicitacoes_recrutador')
+          .select('*').eq('status','pendente').order('created_at',{ascending:false});
+        solics = res.data || [];
+      }catch(e2){ solics = []; }
     }
+    // Debug: mostrar contagem mesmo se vazio
+    console.info('[VagasPro] Solicitações encontradas:', solics.length);
     // Atualizar badge
     var nb = document.getElementById('nbSolicitacoes');
     if(nb) nb.textContent = solics.length > 0 ? solics.length : '';
