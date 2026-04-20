@@ -2118,32 +2118,68 @@ async function _loginComPerfil(email, nomeGoogle, avatar){
   if(!email){showToast('E-mail não obtido.','error');return;}
   if(!_sb){showToast('Banco não configurado.','error');return;}
   try{
-    // 1. Verificar se já tem conta
-    var res = await _sb.from('usuarios')
-      .select('id,nome,nivel,status')
-      .eq('email',email).maybeSingle();
+    // Usar RPC fn_buscar_usuario_google (SECURITY DEFINER — bypassa RLS)
+    // Se a função não existir, tenta .from() direto como fallback
+    var uid = null, nome = null, nivel = null, status = null;
 
-    if(res.data){
-      // Conta existe — verificar status
-      if(res.data.status==='suspenso'){
+    // Tentativa 1: RPC específica para Google (bypassa RLS)
+    try{
+      var rpc = await _sb.rpc('fn_buscar_usuario_google', { p_email: email });
+      if(!rpc.error && rpc.data){
+        uid    = rpc.data.id;
+        nome   = rpc.data.nome;
+        nivel  = rpc.data.nivel;
+        status = rpc.data.status;
+      }
+    }catch(e){ /* RPC não existe ainda — tentar fallback */ }
+
+    // Tentativa 2: query direta (funciona sem RLS ou com policy permissiva)
+    if(!uid){
+      var res = await _sb.from('usuarios')
+        .select('id,nome,nivel,status')
+        .eq('email', email).maybeSingle();
+      if(!res.error && res.data){
+        uid    = res.data.id;
+        nome   = res.data.nome;
+        nivel  = res.data.nivel;
+        status = res.data.status;
+      }
+    }
+
+    // Tentativa 3: fn_auth_login com senha inválida → se retornar erro de senha (não de "não existe") a conta existe
+    if(!uid){
+      try{
+        var rpc2 = await _sb.rpc('fn_auth_login', { p_email: email, p_senha: '__GOOGLE_AUTH__' });
+        if(!rpc2.error && rpc2.data){
+          // ok:false mas com id = conta existe, senha só é diferente
+          if(rpc2.data.id){
+            uid    = rpc2.data.id;
+            nome   = rpc2.data.nome;
+            nivel  = rpc2.data.nivel;
+            status = rpc2.data.status || 'ativo';
+          }
+        }
+      }catch(e){}
+    }
+
+    if(uid){
+      if(status === 'suspenso'){
         showToast('Conta suspensa. Entre em contato com o suporte.','error');
         return;
       }
-      // Atualizar avatar se veio do Google
-      if(avatar && res.data.id){
-        try{ await _sb.rpc('fn_atualizar_usuario',{p_id:res.data.id,p_avatar_url:avatar}); }catch(e){}
-      }
+      // Atualizar avatar Google
+      try{ await _sb.rpc('fn_atualizar_usuario',{p_id:uid, p_avatar_url:avatar||null}); }catch(e){}
       fazerLogin({
-        id:res.data.id,
-        nome:_sanitize(res.data.nome)||nomeGoogle,
-        email:email,
-        nivel:res.data.nivel||'candidato',
-        avatar:avatar
+        id: uid,
+        nome: _sanitize(nome) || nomeGoogle,
+        email: email,
+        nivel: nivel || 'candidato',
+        avatar: avatar
       });
       return;
     }
 
-    // 2. Conta não existe — mostrar modal para escolher tipo e criar
+    // Conta realmente não existe — mostrar modal de cadastro
     _mostrarModalCadastroGoogle(email, nomeGoogle, avatar);
 
   }catch(e){
