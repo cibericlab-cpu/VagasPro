@@ -907,6 +907,16 @@ tbody tr:hover{background:var(--g50);}
 
     <!-- CADASTRAR -->
     <div id="tab-cadastrar" style="display:none;">
+      <button class="btn-google" onclick="loginGoogle()" style="margin-bottom:12px;">
+        <svg width="18" height="18" viewBox="0 0 24 24">
+          <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
+          <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+          <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
+          <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
+        </svg>
+        Criar conta com Google
+      </button>
+      <div class="login-sep">ou preencha os dados abaixo</div>
       <div class="login-field-group">
         <div class="login-field"><label>Nome Completo *</label><input type="text" id="regNome" placeholder="Seu nome completo"></div>
         <div class="login-field"><label>E-mail *</label><input type="email" id="regEmail" placeholder="seu [arroba] email.com"></div>
@@ -2087,19 +2097,145 @@ function inicializarGoogle(){
 // Busca perfil real na tabela usuarios e faz login
 async function _loginComPerfil(email, nomeGoogle, avatar){
   if(!email){showToast('E-mail não obtido.','error');return;}
-  if(_sb){
-    try{
-      var res=await _sb.from('usuarios')
-        .select('id,nome,nivel,status')
-        .eq('email',email).eq('status','ativo').maybeSingle();
-      if(res.data){
-        fazerLogin({id:res.data.id,nome:_sanitize(res.data.nome)||nomeGoogle,
-          email:email,nivel:res.data.nivel||'candidato',avatar:avatar});
+  if(!_sb){showToast('Banco não configurado.','error');return;}
+  try{
+    // 1. Verificar se já tem conta
+    var res = await _sb.from('usuarios')
+      .select('id,nome,nivel,status')
+      .eq('email',email).maybeSingle();
+
+    if(res.data){
+      // Conta existe — verificar status
+      if(res.data.status==='suspenso'){
+        showToast('Conta suspensa. Entre em contato com o suporte.','error');
         return;
       }
-    }catch(e){}
+      // Atualizar avatar se veio do Google
+      if(avatar && res.data.id){
+        try{ await _sb.rpc('fn_atualizar_usuario',{p_id:res.data.id,p_avatar_url:avatar}); }catch(e){}
+      }
+      fazerLogin({
+        id:res.data.id,
+        nome:_sanitize(res.data.nome)||nomeGoogle,
+        email:email,
+        nivel:res.data.nivel||'candidato',
+        avatar:avatar
+      });
+      return;
+    }
+
+    // 2. Conta não existe — mostrar modal para escolher tipo e criar
+    _mostrarModalCadastroGoogle(email, nomeGoogle, avatar);
+
+  }catch(e){
+    console.warn('[_loginComPerfil]',e);
+    showToast('Erro ao verificar conta. Tente novamente.','error');
   }
-  showToast('Conta não encontrada. Cadastre-se primeiro.','error');
+}
+
+// Modal para novo usuário Google escolher tipo de conta
+function _mostrarModalCadastroGoogle(email, nome, avatar){
+  var modal = document.getElementById('googleRegModal');
+  if(!modal){
+    modal = document.createElement('div');
+    modal.id = 'googleRegModal';
+    modal.style.cssText = 'position:fixed;inset:0;background:rgba(15,23,58,.7);z-index:3500;display:flex;align-items:center;justify-content:center;padding:20px;backdrop-filter:blur(6px);';
+    modal.innerHTML = `
+      <div style="background:white;border-radius:24px;padding:36px 32px;max-width:420px;width:100%;text-align:center;box-shadow:0 24px 64px rgba(0,0,0,.2);animation:fadeUp .22s ease;">
+        <div style="width:72px;height:72px;border-radius:50%;background:linear-gradient(135deg,var(--accent),#a78bfa);display:flex;align-items:center;justify-content:center;margin:0 auto 16px;overflow:hidden;">
+          <img id="gRegAvatar" style="width:100%;height:100%;object-fit:cover;" onerror="this.style.display='none'">
+        </div>
+        <div style="font-size:20px;font-weight:900;color:var(--g900);margin-bottom:6px;">Bem-vindo(a)!</div>
+        <div style="font-size:13.5px;color:var(--g500);margin-bottom:4px;font-weight:600;" id="gRegNome"></div>
+        <div style="font-size:12px;color:var(--accent);font-weight:700;margin-bottom:22px;" id="gRegEmail"></div>
+        <div style="font-size:14px;font-weight:800;color:var(--g800);margin-bottom:14px;">Como deseja usar o VagasPro?</div>
+        <div style="display:flex;flex-direction:column;gap:10px;margin-bottom:22px;">
+          <button onclick="_concluirCadastroGoogle('candidato')" style="display:flex;align-items:center;gap:14px;padding:14px 18px;border:2px solid var(--g200);border-radius:var(--r-sm);background:white;cursor:pointer;transition:all .18s;font-family:inherit;text-align:left;width:100%;"
+            onmouseenter="this.style.borderColor='var(--accent)';this.style.background='var(--accent-soft)'"
+            onmouseleave="this.style.borderColor='var(--g200)';this.style.background='white'">
+            <span style="font-size:28px;">👤</span>
+            <div>
+              <div style="font-size:14px;font-weight:800;color:var(--g900);">Candidato</div>
+              <div style="font-size:12px;color:var(--g500);font-weight:600;">Estou buscando emprego</div>
+            </div>
+          </button>
+          <button onclick="_concluirCadastroGoogle('recrutador')" style="display:flex;align-items:center;gap:14px;padding:14px 18px;border:2px solid var(--g200);border-radius:var(--r-sm);background:white;cursor:pointer;transition:all .18s;font-family:inherit;text-align:left;width:100%;"
+            onmouseenter="this.style.borderColor='var(--green2)';this.style.background='var(--green-soft)'"
+            onmouseleave="this.style.borderColor='var(--g200)';this.style.background='white'">
+            <span style="font-size:28px;">🏢</span>
+            <div>
+              <div style="font-size:14px;font-weight:800;color:var(--g900);">Recrutador</div>
+              <div style="font-size:12px;color:var(--g500);font-weight:600;">Publico vagas e contrato pessoas</div>
+            </div>
+          </button>
+        </div>
+        <div style="font-size:11px;color:var(--g400);line-height:1.6;">
+          Ao continuar, você aceita os
+          <span onclick="abrirModalTermos()" style="color:var(--accent);cursor:pointer;font-weight:700;text-decoration:underline;">Termos de Uso e Privacidade</span>
+          da Ciberic.Lab.
+        </div>
+      </div>`;
+    document.body.appendChild(modal);
+  }
+  // Preencher dados
+  var avatarEl = document.getElementById('gRegAvatar');
+  if(avatarEl && avatar) avatarEl.src = avatar;
+  var nomeEl = document.getElementById('gRegNome');
+  if(nomeEl) nomeEl.textContent = nome || '';
+  var emailEl = document.getElementById('gRegEmail');
+  if(emailEl) emailEl.textContent = email || '';
+  // Guardar dados temporários
+  modal._gEmail = email;
+  modal._gNome  = nome;
+  modal._gAvatar = avatar;
+  modal.style.display = 'flex';
+}
+
+async function _concluirCadastroGoogle(nivel){
+  var modal = document.getElementById('googleRegModal');
+  if(!modal) return;
+  var email  = modal._gEmail;
+  var nome   = modal._gNome;
+  var avatar = modal._gAvatar;
+  modal.style.display = 'none';
+
+  if(!_sb){ showToast('Banco não configurado.','error'); return; }
+  showToast('⏳ Criando sua conta...','info');
+
+  try{
+    // Gerar senha aleatória (usuário Google não vai usar senha)
+    var senhaTmp = 'G_' + Math.random().toString(36).slice(2,10) + '_' + Date.now();
+    var res = await _sb.rpc('fn_auth_register',{
+      p_nome:   nome,
+      p_email:  email,
+      p_senha:  senhaTmp,
+      p_nivel:  nivel
+    });
+    if(!res.data || !res.data.ok){
+      showToast((res.data&&res.data.erro)||'Erro ao criar conta.','error');
+      return;
+    }
+    // Marcar e-mail como verificado (Google já verificou) e salvar avatar
+    var uid = res.data.id;
+    if(uid){
+      try{
+        await _sb.rpc('fn_atualizar_usuario',{
+          p_id: uid,
+          p_avatar_url: avatar||null
+        });
+        await _sb.from('usuarios').update({
+          email_verificado: true,
+          aceite_termos: true,
+          aceite_termos_em: new Date().toISOString()
+        }).eq('id', uid);
+      }catch(e){}
+    }
+    showToast('✅ Conta criada com Google!','success');
+    fazerLogin({id:uid, nome:_sanitize(nome), email:_sanitize(email), nivel:nivel, avatar:avatar||''});
+  }catch(e){
+    showToast('Erro ao criar conta. Tente novamente.','error');
+    console.warn('[_concluirCadastroGoogle]',e);
+  }
 }
 
 // Sanitização contra XSS
