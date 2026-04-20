@@ -227,14 +227,18 @@ async function _loginComPerfil(email, nomeGoogle, avatar){
     // Se a função não existir, tenta .from() direto como fallback
     var uid = null, nome = null, nivel = null, status = null;
 
-    // Tentativa 1: RPC específica para Google (bypassa RLS)
+    // Tentativa 1: RPC fn_buscar_usuario_google (SECURITY DEFINER — bypassa RLS)
     try{
       var rpc = await _sb.rpc('fn_buscar_usuario_google', { p_email: email });
       if(!rpc.error && rpc.data){
-        uid    = rpc.data.id;
-        nome   = rpc.data.nome;
-        nivel  = rpc.data.nivel;
-        status = rpc.data.status;
+        // RETURNS TABLE retorna array; RETURNS RECORD retorna objeto — tratar os dois
+        var row = Array.isArray(rpc.data) ? rpc.data[0] : rpc.data;
+        if(row && row.id){
+          uid    = row.id;
+          nome   = row.nome;
+          nivel  = row.nivel;
+          status = row.status;
+        }
       }
     }catch(e){ /* RPC não existe ainda — tentar fallback */ }
 
@@ -256,12 +260,12 @@ async function _loginComPerfil(email, nomeGoogle, avatar){
       try{
         var rpc2 = await _sb.rpc('fn_auth_login', { p_email: email, p_senha: '__GOOGLE_AUTH__' });
         if(!rpc2.error && rpc2.data){
-          // ok:false mas com id = conta existe, senha só é diferente
-          if(rpc2.data.id){
-            uid    = rpc2.data.id;
-            nome   = rpc2.data.nome;
-            nivel  = rpc2.data.nivel;
-            status = rpc2.data.status || 'ativo';
+          var row2 = Array.isArray(rpc2.data) ? rpc2.data[0] : rpc2.data;
+          if(row2 && row2.id){
+            uid    = row2.id;
+            nome   = row2.nome;
+            nivel  = row2.nivel;
+            status = row2.status || 'ativo';
           }
         }
       }catch(e){}
@@ -288,6 +292,7 @@ async function _loginComPerfil(email, nomeGoogle, avatar){
         }catch(e){}
       }
 
+      console.info('[VagasPro] Google login:', email, '| nivel:', nivel, '| uid:', uid);
       fazerLogin({
         id: uid,
         nome: _sanitize(nome) || nomeGoogle,
@@ -299,6 +304,7 @@ async function _loginComPerfil(email, nomeGoogle, avatar){
     }
 
     // Conta realmente não existe — mostrar modal de cadastro
+    console.info('[VagasPro] Google: conta não encontrada para', email, '— abrindo cadastro');
     _mostrarModalCadastroGoogle(email, nomeGoogle, avatar);
 
   }catch(e){
@@ -381,7 +387,10 @@ async function _concluirCadastroGoogle(nivel){
     var existeUid = null;
     try{
       var chkRpc = await _sb.rpc('fn_buscar_usuario_google',{p_email: email});
-      if(!chkRpc.error && chkRpc.data && chkRpc.data.id) existeUid = chkRpc.data.id;
+      if(!chkRpc.error && chkRpc.data){
+        var chkRow = Array.isArray(chkRpc.data) ? chkRpc.data[0] : chkRpc.data;
+        if(chkRow && chkRow.id) existeUid = chkRow.id;
+      }
     }catch(e){}
     if(!existeUid){
       try{
