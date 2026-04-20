@@ -998,13 +998,8 @@ async function aprovarRecrutador(usuarioId, nome, email, aprovar){
     showToast(aprovar ? '✅ Recrutador '+nome+' aprovado!' : '❌ Solicitação de '+nome+' reprovada.', aprovar ? 'success' : 'warning');
     // Enviar email de resultado ao candidato
     if(email){
-      _enviarEmailResend(
-        email,
-        aprovar ? '✅ Acesso de Recrutador aprovado — VagasPro' : 'Atualização sobre sua solicitação — VagasPro',
-        _emailAprovacaoRecrutador(nome, aprovar)
-      ).then(function(r){
-        if(r.ok) showToast('📧 E-mail enviado para '+email,'info');
-      });
+      _notificarEmail('aprovacao_recrutador', { para: email, nome: nome, aprovado: aprovar })
+        .then(function(r){ if(r.ok) showToast('📧 E-mail enviado para '+email,'info'); });
     }
     // Recarregar painel de solicitações se estiver aberto
     if(typeof renderSolicitacoesRecrutador === 'function') renderSolicitacoesRecrutador();
